@@ -48,6 +48,21 @@ button{cursor:pointer}
 
 header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .brand{font-family:var(--display);font-size:1.35rem;letter-spacing:.06em;margin:0}
+.now{max-width:1040px;margin:0 auto 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:6px 20px;align-items:center}
+@media (max-width:560px){.now{grid-template-columns:minmax(0,1fr)}}
+.clock{display:flex;flex-direction:column;gap:2px;min-width:0}
+.clock .tm{font-family:var(--mono);font-size:2.1rem;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.clock .tm small{font-size:1.1rem;color:var(--muted);margin-left:2px}
+.clock .dt{font-size:.85rem;color:var(--muted)}
+.nowside{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tzrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tzrow select{width:auto;max-width:100%;padding:5px 8px;font-size:.9rem;background:var(--paper)}
+.tzdiff{font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.locrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.88rem;min-width:0}
+.locrow svg{flex:none;color:var(--accent)}
+.locrow .lt{overflow-wrap:anywhere;min-width:0}
+.locrow .lt small{color:var(--muted);margin-left:4px}
+.locrow .ghost{font-size:.78rem;padding:3px 10px}
 .sync{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .sync.ok .dot{background:var(--c-class)}
@@ -122,6 +137,28 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .cats .addcat:hover{border-color:var(--accent);color:var(--accent)}
 .catbox{display:flex;flex-direction:column;gap:8px}
 .catlbl{font-size:.8rem;color:var(--muted)}
+.route{display:flex;flex-direction:column;gap:8px}
+.route>.ghost{align-self:flex-start;font-size:.85rem}
+.routebox{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--paper)}
+.routebox input,.routebox select{background:var(--card)}
+.routelinks{display:flex;gap:8px;flex-wrap:wrap}
+.routelinks a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:8px;padding:8px 12px;font-size:.88rem;font-weight:500}
+.routelinks a.y{background:var(--accent);color:var(--card)}
+.routelinks a.g{border:1px solid var(--line);color:var(--ink);background:var(--card)}
+.routelinks a[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.rres{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;display:flex;flex-direction:column;gap:8px}
+.rsum{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.rmin{font-family:var(--mono);font-size:1.6rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.rmin small{font-size:.85rem;margin-left:2px;color:var(--muted)}
+.rfare{font-family:var(--mono);font-size:1.15rem;font-weight:500;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;line-height:1.2}
+.rfare small{font-size:.75rem;color:var(--muted);font-weight:400}
+.rtr{font-size:.8rem;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+.rlegs{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.rlegs span{color:var(--muted);font-size:.78rem;margin-left:6px}
+.rnote{font-size:.75rem;color:var(--muted);margin:0}
+.fsel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+.swap{border:1px solid var(--line);background:var(--card);border-radius:8px;width:38px;height:38px;font-size:1rem}
 .newcat{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--paper)}
 .newcat input[type=text]{background:var(--card)}
 .swatches{display:flex;gap:8px;flex-wrap:wrap}
@@ -143,8 +180,26 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 
 <header class="top">
   <h1 class="brand">日程手帳</h1>
-  <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+  <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="fareBtn">運賃・時間</button><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
 </header>
+
+<section class="now" aria-label="現在時刻と現在地">
+  <div class="clock">
+    <div class="tm" id="clockTime" aria-live="off">--:--</div>
+    <div class="dt" id="clockDate"></div>
+  </div>
+  <div class="nowside">
+    <div class="tzrow">
+      <select id="tzSel" aria-label="表示する地域の時刻"></select>
+      <span class="tzdiff" id="tzDiff"></span>
+    </div>
+    <div class="locrow">
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+      <span class="lt" id="locText">現在地はまだ取得していません</span>
+      <button class="ghost" id="locBtn" type="button">現在地を取得</button>
+    </div>
+  </div>
+</section>
 
 <main class="wrap">
   <section class="cal" aria-label="カレンダー">
@@ -182,7 +237,26 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
         <label>開始時刻<input id="f-start" type="time"></label>
         <label>終了時刻<input id="f-end" type="time"></label>
       </div>
-      <label>場所<input id="f-place" maxlength="60" placeholder="任意"></label>
+      <label>場所<input id="f-place" maxlength="60" placeholder="任意（駅名を入れると行き方を調べやすくなります）"></label>
+      <div class="route">
+        <button type="button" class="ghost" id="routeBtn" aria-expanded="false">電車の行き方・料金を調べる</button>
+        <div class="routebox" id="routeBox" hidden>
+          <div class="row">
+            <label>出発<input id="r-from" maxlength="40" placeholder="例：飯田橋"></label>
+            <label>到着<input id="r-to" maxlength="60" placeholder="例：神楽坂"></label>
+          </div>
+          <div class="row">
+            <label>時刻の指定<select id="r-type"><option value="4">到着時刻</option><option value="1">出発時刻</option><option value="now">今すぐ出発</option></select></label>
+            <label>時刻<input id="r-time" type="time"></label>
+          </div>
+          <div id="r-calc"></div>
+          <div class="routelinks">
+            <a class="y" id="r-yahoo" href="#" target="_blank" rel="noopener">Yahoo!乗換案内で調べる</a>
+            <a class="g" id="r-google" href="#" target="_blank" rel="noopener">Googleマップで調べる</a>
+          </div>
+          <p class="hint" id="r-hint">Yahoo!乗換案内では、乗る電車・乗り換え・所要時間・運賃が出ます。出発駅は次回のために保存されます。</p>
+        </div>
+      </div>
       <div class="catbox">
         <span class="catlbl">カテゴリ</span>
         <div class="cats" id="f-cats" role="radiogroup" aria-label="カテゴリ"></div>
@@ -205,7 +279,97 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
   </div>
 </div>
 
+<div class="overlay" id="fareOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="fareTitle">
+    <h3 id="fareTitle">運賃・所要時間</h3>
+    <form id="fareForm" onsubmit="return false">
+      <p class="hint">常磐線（上野〜取手）と東武アーバンパークライン（大宮〜船橋）の駅どうしで計算します。柏での乗り換えにも対応しています。</p>
+      <div class="fsel">
+        <label>出発<select id="fa-from"></select></label>
+        <button type="button" class="swap" id="fa-swap" aria-label="出発と到着を入れ替える">⇄</button>
+        <label>到着<select id="fa-to"></select></label>
+      </div>
+      <div id="fa-result"></div>
+      <div class="actions"><div class="r"><button type="button" class="ghost" id="fa-close">閉じる</button></div></div>
+    </form>
+  </div>
+</div>
+
 <script>
+/* ---------- 運賃・所要時間（常磐線・東武アーバンパークライン） ----------
+   出典: 営業キロ … 各線の駅一覧（日暮里起点・大宮起点）
+         JR運賃 … JR東日本「運賃改定のご案内」2026年3月14日改定後の幹線運賃表
+         東武運賃 … 東武鉄道 対キロ運賃表（2023年3月18日改定、バリアフリー料金込み）
+   所要時間は目安（常磐線は時刻表から、東武は駅間距離からの推定） */
+const RAIL={
+  updated:"2026年11月",
+  jrFare:[[3,155,160],[6,199,200],[10,209,210],[15,253,260],[20,341,350],[25,440,440],[30,528,530],[35,616,620],[40,715,720],[45,803,810],[50,902,910],[60,1034,1040]],
+  tobuFare:[[4,157,160],[7,178,180],[10,209,210],[15,261,270],[20,324,330],[25,377,380],[30,429,430],[35,481,490],[40,534,540],[45,607,610],[50,670,670],[60,743,750],[70,827,830]],
+  // [駅名, 営業キロ]  JRは日暮里起点（上野は日暮里の2.2km手前）
+  jrKm:{"上野":-2.2,"日暮里":0,"三河島":1.2,"南千住":3.4,"北千住":5.2,"綾瀬":7.7,"亀有":9.9,"金町":11.8,"松戸":15.7,"北松戸":17.8,"馬橋":19.1,"新松戸":20.7,"北小金":22.0,"南柏":24.5,"柏":26.9,"北柏":29.2,"我孫子":31.3,"天王台":34.0,"取手":37.4},
+  tobuKm:{"大宮":0,"北大宮":1.2,"大宮公園":2.2,"大和田":4.0,"七里":5.6,"岩槻":8.5,"東岩槻":10.9,"豊春":12.2,"八木崎":14.1,"春日部":15.2,"藤の牛島":17.8,"南桜井":20.6,"川間":22.9,"七光台":25.1,"清水公園":26.6,"愛宕":27.7,"野田市":28.6,"梅郷":30.9,"運河":33.2,"江戸川台":35.1,"初石":36.8,"流山おおたかの森":38.4,"豊四季":39.7,"柏":42.9,"新柏":45.8,"増尾":47.1,"逆井":48.0,"高柳":50.2,"六実":51.9,"新鎌ヶ谷":53.3,"鎌ヶ谷":55.2,"馬込沢":57.7,"塚田":60.1,"新船橋":61.3,"船橋":62.7},
+  // 運転系統: [名前, 会社, 駅と駅間分]
+  services:[
+    {id:"jrR",name:"常磐線快速",co:"JR",seq:["上野",4,"日暮里",2,"三河島",3,"南千住",2,"北千住",10,"松戸",9,"柏",4,"我孫子",3,"天王台",4,"取手"]},
+    {id:"jrL",name:"常磐線各駅停車",co:"JR",seq:["北千住",3,"綾瀬",3,"亀有",3,"金町",4,"松戸",4,"北松戸",2,"馬橋",3,"新松戸",2,"北小金",3,"南柏",3,"柏",3,"北柏",2,"我孫子",4,"天王台",4,"取手"]},
+    {id:"td",name:"東武アーバンパークライン（各停）",co:"東武",seq:null},
+    {id:"tdx",name:"東武アーバンパークライン（急行）",co:"東武",seq:null,stops:["大宮","岩槻","春日部","藤の牛島","南桜井","川間","七光台","清水公園","愛宕","野田市","梅郷","運河","流山おおたかの森","柏","高柳","新鎌ヶ谷","船橋"]}
+  ],
+  sameCoTransfer:3, otherCoTransfer:6
+};
+(function buildTobu(){
+  // 駅間の所要時間を距離から推定（柏より大宮側は単線区間が多く遅め）。実際の時刻表の柏〜船橋・柏〜大宮で調整済み
+  const K=RAIL.tobuKm,north=n=>K[n]<=K["柏"];
+  const mk=(names,local)=>{const seq=[names[0]];
+    for(let i=1;i<names.length;i++){const d=K[names[i]]-K[names[i-1]],n=north(names[i]);
+      seq.push(local?(n?0.9+d*1.0:1.0+d*1.1):(n?1.0+d*0.98:0.5+d*0.85),names[i])}return seq};
+  RAIL.services[2].seq=mk(Object.keys(K),true);
+  RAIL.services[3].seq=mk(RAIL.services[3].stops,false);
+})();
+const RAIL_STATIONS=(()=>{const s=new Set();for(const sv of RAIL.services)for(let i=0;i<sv.seq.length;i+=2)s.add(sv.seq[i]);return s})();
+function normStation(x){return String(x||"").trim().replace(/[（(].*?[)）]/g,"").replace(/駅$/,"").replace(/ケ/g,"ヶ")}
+function fareFor(table,km){const k=Math.ceil(km-1e-9);for(const [max,ic,tk] of table)if(k<=max)return{ic,tk};return null}
+function railRoute(fromName,toName){
+  const A=normStation(fromName),B=normStation(toName);
+  if(!RAIL_STATIONS.has(A)||!RAIL_STATIONS.has(B)||A===B)return null;
+  // 状態 = 駅@系統 のダイクストラ
+  const adj={};const key=(st,sv)=>st+"@"+sv;
+  const add=(a,b,w,info)=>{(adj[a]=adj[a]||[]).push({to:b,w,info})};
+  const at={};
+  for(const sv of RAIL.services){const q=sv.seq;
+    for(let i=0;i<q.length;i+=2){(at[q[i]]=at[q[i]]||[]).push(sv)}
+    for(let i=0;i+2<q.length;i+=2){const a=key(q[i],sv.id),b=key(q[i+2],sv.id);add(a,b,q[i+1],{sv,ride:true});add(b,a,q[i+1],{sv,ride:true})}}
+  for(const st in at){const list=at[st];for(const s1 of list)for(const s2 of list)if(s1!==s2)
+    add(key(st,s1.id),key(st,s2.id),s1.co===s2.co?RAIL.sameCoTransfer:RAIL.otherCoTransfer,{transfer:true})}
+  const dist={},prev={},done=new Set();const pq=[];
+  for(const sv of at[A]){const k=key(A,sv.id);dist[k]=0;pq.push(k)}
+  const targets=new Set(at[B].map(sv=>key(B,sv.id)));let end=null;
+  while(pq.length){pq.sort((x,y)=>dist[x]-dist[y]);const u=pq.shift();if(done.has(u))continue;done.add(u);
+    if(targets.has(u)){end=u;break}
+    for(const e of adj[u]||[]){const nd=dist[u]+e.w;if(dist[e.to]===undefined||nd<dist[e.to]-1e-9){dist[e.to]=nd;prev[e.to]={from:u,e};pq.push(e.to)}}}
+  if(!end)return null;
+  // 経路を区間ごとにまとめる
+  const steps=[];let cur=end;while(prev[cur]){steps.unshift({...prev[cur],to:cur});cur=prev[cur].from}
+  const legs=[];
+  for(const s of steps){if(!s.e.info.ride)continue;const sv=s.e.info.sv;const fromSt=s.from.split("@")[0],toSt=s.to.split("@")[0];
+    const last=legs[legs.length-1];
+    if(last&&last.sv===sv&&last.to===fromSt){last.to=toSt;last.min+=s.e.w;last.stops++}else legs.push({sv,from:fromSt,to:toSt,min:s.e.w,stops:1})}
+  // 運賃: 会社ごとに連続区間のキロで計算して合計
+  const parts=[];
+  for(const l of legs){const co=l.sv.co;const last=parts[parts.length-1];
+    if(last&&last.co===co&&last.to===l.from){last.to=l.to}else parts.push({co,from:l.from,to:l.to})}
+  let ic=0,tk=0;const fareParts=[];
+  for(const p of parts){const kmTab=p.co==="JR"?RAIL.jrKm:RAIL.tobuKm;const km=Math.abs(kmTab[p.to]-kmTab[p.from]);
+    const f=fareFor(p.co==="JR"?RAIL.jrFare:RAIL.tobuFare,km);if(!f)return null;ic+=f.ic;tk+=f.tk;fareParts.push({...p,km,...f})}
+  return{from:A,to:B,minutes:Math.round(dist[end]),legs:legs.map(l=>({line:l.sv.name,co:l.sv.co,from:l.from,to:l.to,min:Math.round(l.min),stops:l.stops})),ic,tk,fareParts,transfers:legs.length-1};
+}
+function railHTML(r){
+  if(!r)return"";
+  const legs=r.legs.map(l=>`<li><b>${l.line}</b> ${l.from} → ${l.to}<span>約${l.min}分・${l.stops}駅</span></li>`).join("");
+  const fp=r.fareParts.length>1?`<p class="rnote">運賃の内訳：${r.fareParts.map(p=>`${p.co} ${p.from}〜${p.to}（${p.km.toFixed(1)}km）IC ${p.ic}円`).join("＋")}</p>`:`<p class="rnote">${r.fareParts[0].co} ${r.fareParts[0].km.toFixed(1)}km</p>`;
+  return `<div class="rres"><div class="rsum"><span class="rmin">約${r.minutes}<small>分</small></span><span class="rfare">IC ${r.ic.toLocaleString()}円<small>きっぷ ${r.tk.toLocaleString()}円</small></span><span class="rtr">${r.transfers?`乗換${r.transfers}回`:"乗換なし"}</span></div><ol class="rlegs">${legs}</ol>${fp}<p class="rnote">所要時間は待ち時間を含まない目安です。運賃は${RAIL.updated}時点の公式運賃表から計算しています。</p></div>`;
+}
+
 const CATS={lab:{name:"研究",v:"--c-lab"},class:{name:"授業",v:"--c-class"},plan:{name:"予定",v:"--c-plan"},me:{name:"個人",v:"--c-me"}};
 const PALETTE=["#d0563f","#d99a1e","#3a93a8","#5f9a3a","#7a5cc2","#c95c8c","#6b7a8f","#e07b39"];
 const CKEY="schedule-cats-v1";
@@ -377,11 +541,49 @@ $("nc-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault
 function openForm(e,date){
   editing=e||null;$("formTitle").textContent=e?"予定を編集":"予定を追加";
   $("f-title").value=e?.title||"";$("f-date").value=e?.date||date||sel;$("f-enddate").value=e&&isMulti(e)?e.endDate:"";$("f-place").value=e?.place||"";
-  $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";
+  $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";resetRoute();
   renderCats(e?(getCat(e.cat).id):"lab");$("newCat").hidden=true;$("delBtn").hidden=!e;$("f-err").hidden=true;
   $("overlay").hidden=false;setTimeout(()=>$("f-title").focus(),50);
 }
 function closeForm(){$("overlay").hidden=true;editing=null}
+
+/* ---------- 乗換案内 ---------- */
+const FROMKEY="schedule-from-v1";
+function resetRoute(){
+  $("routeBox").hidden=true;$("routeBtn").setAttribute("aria-expanded","false");
+}
+$("routeBtn").onclick=()=>{
+  const open=$("routeBox").hidden;$("routeBox").hidden=!open;$("routeBtn").setAttribute("aria-expanded",String(open));
+  if(open){
+    try{$("r-from").value=$("r-from").value||localStorage.getItem(FROMKEY)||""}catch(e){}
+    $("r-to").value=$("f-place").value.trim();
+    const st=$("f-start").value;
+    $("r-type").value=st?"4":"now";$("r-time").value=st;
+    updateRoute();
+    (!$("r-from").value?$("r-from"):$("r-to")).focus();
+  }
+};
+function updateRoute(){
+  const from=$("r-from").value.trim(),to=$("r-to").value.trim(),type=$("r-type").value;
+  $("r-calc").innerHTML=railHTML(railRoute(from,to));
+  $("r-time").disabled=type==="now";
+  let d,hh,mm;
+  if(type==="now"){const n=new Date();d=n;hh=n.getHours();mm=n.getMinutes()}
+  else{d=parse($("f-date").value||sel);const t=($("r-time").value||"09:00").split(":");hh=+t[0];mm=+t[1]}
+  const q=new URLSearchParams({from,to,y:String(d.getFullYear()),m:pad(d.getMonth()+1),d:pad(d.getDate()),hh:String(hh),m1:String(Math.floor(mm/10)),m2:String(mm%10),type:type==="now"?"1":type,ticket:"ic"});
+  const y=$("r-yahoo"),g=$("r-google");
+  y.href="https://transit.yahoo.co.jp/search/result?"+q.toString();
+  y.setAttribute("aria-disabled",String(!(from&&to)));
+  const gq=new URLSearchParams({api:"1",destination:to,travelmode:"transit"});if(from)gq.set("origin",from);
+  g.href="https://www.google.com/maps/dir/?"+gq.toString();
+  g.setAttribute("aria-disabled",String(!to));
+  $("r-hint").textContent=!to?"到着に行き先（駅名や施設名）を入れてください。":!from?"出発駅を入れるとYahoo!乗換案内で調べられます。Googleマップは空欄なら現在地から調べます。":"Yahoo!乗換案内では、乗る電車・乗り換え・所要時間・運賃が出ます。出発駅は次回のために保存されます。";
+}
+["r-from","r-to","r-time"].forEach(id=>$(id).addEventListener("input",updateRoute));
+$("r-type").addEventListener("change",updateRoute);
+$("r-from").addEventListener("change",()=>{try{localStorage.setItem(FROMKEY,$("r-from").value.trim())}catch(e){}});
+$("f-place").addEventListener("input",()=>{if(!$("routeBox").hidden){$("r-to").value=$("f-place").value.trim();updateRoute()}});
+$("f-start").addEventListener("input",()=>{if(!$("routeBox").hidden&&$("r-type").value!=="now"){$("r-time").value=$("f-start").value;updateRoute()}});
 $("form").addEventListener("submit",async ev=>{
   ev.preventDefault();
   const s=$("f-start").value,en=$("f-end").value;
@@ -421,6 +623,89 @@ async function addSamples(){
     {title:"（例）友人とご飯",date:off(4),start:"19:00",end:"",place:"駅前",memo:"",cat:"me"}];
   for(const [i,e] of s.entries()){try{await store.put({id:"sample"+i+Date.now().toString(36),...e})}catch(err){}}
 }
+/* ---------- 現在時刻・世界の時刻 ---------- */
+const DEVICE_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Tokyo"}catch(e){return"Asia/Tokyo"}})();
+const ZONES=[["","この端末の時刻"],["Asia/Tokyo","東京"],["Asia/Seoul","ソウル"],["Asia/Shanghai","北京・上海"],["Asia/Taipei","台北"],["Asia/Hong_Kong","香港"],
+  ["Asia/Bangkok","バンコク"],["Asia/Singapore","シンガポール"],["Asia/Kolkata","デリー・ムンバイ"],["Asia/Dubai","ドバイ"],["Europe/Moscow","モスクワ"],
+  ["Europe/London","ロンドン"],["Europe/Paris","パリ"],["Europe/Berlin","ベルリン"],["America/New_York","ニューヨーク"],["America/Chicago","シカゴ"],
+  ["America/Los_Angeles","ロサンゼルス"],["Pacific/Honolulu","ホノルル"],["America/Sao_Paulo","サンパウロ"],["Australia/Sydney","シドニー"],["Pacific/Auckland","オークランド"],["UTC","協定世界時（UTC）"]];
+const TZKEY="schedule-tz-v1";
+let tz=(()=>{try{return localStorage.getItem(TZKEY)||""}catch(e){return""}})();
+if(tz&&!ZONES.some(z=>z[0]===tz))tz="";
+$("tzSel").innerHTML=ZONES.map(([v,n])=>`<option value="${v}">${n}</option>`).join("");
+$("tzSel").value=tz;
+$("tzSel").onchange=()=>{tz=$("tzSel").value;try{localStorage.setItem(TZKEY,tz)}catch(e){}tick()};
+function offsetMin(zone,d){
+  try{const p=new Intl.DateTimeFormat("en-US",{timeZone:zone,timeZoneName:"shortOffset"}).formatToParts(d).find(x=>x.type==="timeZoneName").value;
+    const m=p.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);return m?(m[1]==="-"?-1:1)*(+m[2]*60+(+m[3]||0)):0}catch(e){return 0}
+}
+function tick(){
+  const now=new Date(),zone=tz||DEVICE_TZ;
+  const parts=Object.fromEntries(new Intl.DateTimeFormat("ja-JP",{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(now).map(x=>[x.type,x.value]));
+  $("clockTime").innerHTML=`${parts.hour}:${parts.minute}<small>${parts.second}</small>`;
+  $("clockDate").textContent=new Intl.DateTimeFormat("ja-JP",{timeZone:zone,year:"numeric",month:"long",day:"numeric",weekday:"short"}).format(now)+(tz?"":"　"+zone);
+  if(tz){const diff=(offsetMin(zone,now)-offsetMin(DEVICE_TZ,now))/60;
+    const off=offsetMin(zone,now)/60;
+    $("tzDiff").textContent=`UTC${off>=0?"+":""}${off}`+(diff===0?"・この端末と同じ":`・この端末より${diff>0?"+":""}${diff}時間`);
+  }else $("tzDiff").textContent="";
+}
+tick();setInterval(tick,1000);
+
+/* ---------- 現在地 ---------- */
+const LOCKEY="schedule-loc-v1";
+function showLoc(o){
+  const t=new Date(o.at);
+  $("locText").innerHTML="";$("locText").textContent=o.text;
+  const sm=document.createElement("small");sm.textContent=`${t.getMonth()+1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())}時点`;$("locText").appendChild(sm);
+  $("locBtn").textContent="更新";
+}
+try{const o=JSON.parse(localStorage.getItem(LOCKEY)||"null");if(o&&o.text)showLoc(o)}catch(e){}
+async function placeName(lat,lon){
+  try{const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ja`);
+    if(!r.ok)throw 0;const j=await r.json();
+    const name=[j.countryCode&&j.countryCode!=="JP"?j.countryName:"",j.principalSubdivision,j.city,j.locality].filter(Boolean);
+    const uniq=name.filter((x,i)=>name.indexOf(x)===i).join(" ");
+    if(uniq)return uniq;
+  }catch(e){}
+  return `緯度 ${lat.toFixed(3)}, 経度 ${lon.toFixed(3)}`;
+}
+function getLocation(){
+  if(!("geolocation" in navigator)){$("locText").textContent="この端末では位置情報を使えません";return}
+  $("locBtn").disabled=true;$("locText").textContent="現在地を取得しています…";
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const text=await placeName(pos.coords.latitude,pos.coords.longitude);
+    const o={text,at:Date.now()};try{localStorage.setItem(LOCKEY,JSON.stringify(o))}catch(e){}
+    showLoc(o);$("locBtn").disabled=false;
+  },err=>{
+    $("locText").textContent=err.code===1?"位置情報が許可されていません。端末の設定でこのアプリ（ブラウザ）の位置情報をオンにしてください":"現在地を取得できませんでした。電波のよい場所でもう一度お試しください";
+    $("locBtn").disabled=false;$("locBtn").textContent="もう一度";
+  },{enableHighAccuracy:false,timeout:15000,maximumAge:300000});
+}
+$("locBtn").onclick=getLocation;
+// 以前に許可済みなら、開いたときに自動で更新する
+try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted")getLocation()}).catch(()=>{})}catch(e){}
+
+/* ---------- 運賃・時間の画面 ---------- */
+(function(){
+  const jr=Object.keys(RAIL.jrKm),td=Object.keys(RAIL.tobuKm).filter(x=>x!=="柏");
+  const opts=`<optgroup label="常磐線">${jr.map(n=>`<option>${n}</option>`).join("")}</optgroup><optgroup label="東武アーバンパークライン">${td.map(n=>`<option>${n}</option>`).join("")}</optgroup>`;
+  $("fa-from").innerHTML=opts;$("fa-to").innerHTML=opts;
+  const FKEY="schedule-fare-v1";
+  try{const o=JSON.parse(localStorage.getItem(FKEY)||"null");if(o){$("fa-from").value=o.f;$("fa-to").value=o.t}}catch(e){}
+  if(!$("fa-from").value||$("fa-from").value===$("fa-to").value){$("fa-from").value="柏";$("fa-to").value="上野"}
+  function calc(){
+    const f=$("fa-from").value,t=$("fa-to").value;
+    try{localStorage.setItem(FKEY,JSON.stringify({f,t}))}catch(e){}
+    $("fa-result").innerHTML=f===t?'<p class="hint">出発と到着に別の駅を選んでください。</p>':railHTML(railRoute(f,t));
+  }
+  $("fa-from").onchange=calc;$("fa-to").onchange=calc;
+  $("fa-swap").onclick=()=>{const a=$("fa-from").value;$("fa-from").value=$("fa-to").value;$("fa-to").value=a;calc()};
+  $("fareBtn").onclick=()=>{calc();$("fareOverlay").hidden=false};
+  $("fa-close").onclick=()=>{$("fareOverlay").hidden=true};
+  $("fareOverlay").addEventListener("click",e=>{if(e.target.id==="fareOverlay")$("fareOverlay").hidden=true});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")$("fareOverlay").hidden=true});
+})();
+
 init();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
