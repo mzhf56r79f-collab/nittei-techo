@@ -1,5 +1,5 @@
 // 日程手帳 Service Worker — アプリ本体をキャッシュしてオフラインでも起動できるようにする
-const VERSION = "v9";
+const VERSION = "v10";
 const CORE = ["./", "index.html", "manifest.json", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -29,4 +29,13 @@ self.addEventListener("fetch", e => {
       return r;
     })));
   }
+});
+
+// 通知をタップしたらアプリを開く
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(list => {
+    for (const c of list) { if ("focus" in c) return c.focus(); }
+    return self.clients.openWindow("./");
+  }));
 });

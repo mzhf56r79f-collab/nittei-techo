@@ -251,6 +251,12 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .costlist .d{font-family:var(--mono);color:var(--muted);font-size:.78rem}
 .costlist .a{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .costlist small{display:block;color:var(--muted);font-size:.74rem}
+.notifbox{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.notifbox h4{margin:0;font-size:.9rem}
+.notifbox .st{font-size:.8rem;color:var(--muted);margin:0}
+.notifbox .st.ok{color:var(--c-class)}
+.notifbox .st.ng{color:var(--sun)}
+.icsbtn{align-self:flex-start;font-size:.85rem}
 .mnav{display:flex;align-items:center;gap:8px}
 .mnav button{border:1px solid var(--line);background:var(--card);border-radius:8px;width:32px;height:32px}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
@@ -366,7 +372,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
       </div>
       <p class="err" id="f-err" hidden></p>
       <div class="actions">
-        <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="danger" id="delOneBtn" hidden>この回だけ削除</button><button type="button" class="danger" id="delBtn" hidden>削除</button></span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="ghost" id="icsOneBtn" hidden>カレンダーに追加（通知つき）</button><button type="button" class="danger" id="delOneBtn" hidden>この回だけ削除</button><button type="button" class="danger" id="delBtn" hidden>削除</button></span>
         <div class="r">
           <button type="button" class="ghost" id="cancelBtn">キャンセル</button>
           <button type="submit" class="primary">保存</button>
@@ -402,6 +408,17 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
         <label>家から駅まで（徒歩・分）<input id="s-walk" type="number" min="0" max="90" step="1" inputmode="numeric"></label>
       </div>
       <p class="hint">最寄り駅が柏のときは、実際の時刻表から乗る電車まで出します。それ以外の駅では所要時間から目安を出します。</p>
+      <div class="notifbox">
+        <h4>予定の通知</h4>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="s-notify">予定の前に通知する</label>
+          <label>何分前に<select id="s-notifymin"><option value="10">10分前</option><option value="30">30分前</option><option value="60">1時間前</option><option value="120">2時間前</option></select></label>
+        </div>
+        <p class="st" id="s-notifyst"></p>
+        <button type="button" class="ghost" id="s-test">テスト通知を送る</button>
+        <p class="hint">アプリの通知は、アプリが開いているとき（またはバックグラウンドで動いているとき）に届きます。アプリを完全に閉じていても確実に通知したい場合は、下のボタンで予定をスマホのカレンダーに入れてください。カレンダーアプリから通知が届きます。</p>
+        <button type="button" class="ghost icsbtn" id="s-ics">これからの予定をカレンダーに追加（通知つき）</button>
+      </div>
       <div class="actions"><div class="r"><button type="button" class="primary" id="s-close">閉じる</button></div></div>
     </form>
   </div>
@@ -531,6 +548,7 @@ function setSync(ok,text){$("sync").classList.toggle("ok",ok);$("syncText").text
 function init(){
   store=local;events=local.load();ready=true;
   setSync(true,"この端末に保存");render();
+  setTimeout(()=>{try{checkNotify()}catch(e){}},500);
 }
 
 /* ---------- バックアップ（JSON書き出し・読み込み） ---------- */
@@ -712,7 +730,7 @@ function openForm(e,date){
   editing=e||null;editingOcc=e&&e.repeat?date:null;$("formTitle").textContent=e?(e.repeat?"繰り返し予定を編集（すべての回）":"予定を編集"):"予定を追加";
   $("f-repeat").value=e?.repeat||"";$("f-until").value=e?.repeatUntil||"";$("f-until-l").hidden=!$("f-repeat").value;
   $("f-deadline").checked=!!e?.deadline;$("f-fare").checked=!!e?.fare;$("f-round").checked=e?.fare?!!e.fare.round:true;
-  $("delOneBtn").hidden=!(e&&e.repeat);
+  $("delOneBtn").hidden=!(e&&e.repeat);$("icsOneBtn").hidden=!e;
   $("f-title").value=e?.title||"";$("f-date").value=e?.date||date||sel;$("f-enddate").value=e&&isMulti(e)?e.endDate:"";$("f-place").value=e?.place||"";
   $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";resetRoute();
   renderCats(e?(getCat(e.cat).id):"lab");$("newCat").hidden=true;$("delBtn").hidden=!e;$("delBtn").textContent=e&&e.repeat?"すべての回を削除":"削除";$("f-err").hidden=true;
@@ -1140,6 +1158,106 @@ $("c-next").onclick=()=>{costMonth=new Date(costMonth.getFullYear(),costMonth.ge
 $("c-close").onclick=()=>{$("costOverlay").hidden=true};
 $("costOverlay").addEventListener("click",e=>{if(e.target.id==="costOverlay")$("costOverlay").hidden=true});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("costOverlay").hidden=true;$("setOverlay").hidden=true}});
+
+/* ---------- 通知 ---------- */
+settings.notify=!!settings.notify;settings.notifyMin=+settings.notifyMin||60;
+const NKEY="schedule-notified-v1";
+let notified=(()=>{try{return JSON.parse(localStorage.getItem(NKEY)||"{}")}catch(e){return{}}})();
+const minLabel=m=>m>=60&&m%60===0?`${m/60}時間`:`${m}分`;
+function notifySupported(){return "Notification" in window}
+function updNotifyStatus(){
+  const st=$("s-notifyst");st.className="st";
+  if(!notifySupported()){st.textContent="この端末・ブラウザでは通知を使えません。カレンダーに追加する方法を使ってください。";st.classList.add("ng");return}
+  const p=Notification.permission;
+  if(!settings.notify){st.textContent="通知はオフです。";return}
+  if(p==="granted"){st.textContent=`オン：当日の予定の${minLabel(settings.notifyMin)}前に通知します。`;st.classList.add("ok")}
+  else if(p==="denied"){st.textContent="通知がブロックされています。端末の設定でこのアプリの通知を許可してください。";st.classList.add("ng")}
+  else st.textContent="通知の許可が必要です。";
+}
+async function showNote(title,body,tag){
+  try{const reg=await navigator.serviceWorker?.getRegistration();
+    if(reg&&reg.showNotification){await reg.showNotification(title,{body,tag,icon:"icons/icon-192.png",badge:"icons/icon-192.png"});return true}}catch(e){}
+  try{new Notification(title,{body,tag,icon:"icons/icon-192.png"});return true}catch(e){return false}
+}
+function checkNotify(){
+  if(!settings.notify||!notifySupported()||Notification.permission!=="granted"||!ready)return;
+  const now=new Date(),k=ymd(now),nm=now.getHours()*60+now.getMinutes();
+  for(const x of expand(k,k)){
+    if(!x.start||isMulti(x)||(x.deadline&&isDone(x)))continue;
+    const sm=toMin(x.start),fire=sm-settings.notifyMin;
+    const key=`${x.id}|${k}|${x.start}|${settings.notifyMin}`;
+    if(nm>=fire&&nm<sm&&!notified[key]){
+      notified[key]=k;
+      const left=sm-nm;const lbl=left>=settings.notifyMin-1?minLabel(settings.notifyMin):`${left}分`;
+      const dp=departInfo(x);
+      showNote(`${x.start}　${x.title}　${lbl}前だよ`,[x.place,dp?dp.text:""].filter(Boolean).join("\n"),key);
+    }
+  }
+  // 古い記録を消す
+  for(const key in notified)if(notified[key]<addDays(k,-3))delete notified[key];
+  try{localStorage.setItem(NKEY,JSON.stringify(notified))}catch(e){}
+}
+setInterval(checkNotify,30000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkNotify()});
+$("s-notify").onchange=async()=>{
+  settings.notify=$("s-notify").checked;
+  if(settings.notify&&notifySupported()&&Notification.permission==="default"){try{await Notification.requestPermission()}catch(e){}}
+  if(settings.notify&&notifySupported()&&Notification.permission==="denied"){settings.notify=false;$("s-notify").checked=false}
+  saveSettings();updNotifyStatus();checkNotify();
+};
+$("s-notifymin").onchange=()=>{settings.notifyMin=+$("s-notifymin").value;saveSettings();updNotifyStatus()};
+$("s-test").onclick=async()=>{
+  if(notifySupported()&&Notification.permission==="default"){try{await Notification.requestPermission()}catch(e){}}
+  if(!notifySupported()||Notification.permission!=="granted"){updNotifyStatus();$("s-notifyst").textContent="通知が許可されていないため送れませんでした。"+(notifySupported()&&Notification.permission==="denied"?"端末の設定で通知を許可してください。":"");$("s-notifyst").className="st ng";return}
+  const t=new Date();t.setMinutes(t.getMinutes()+settings.notifyMin);
+  const ok=await showNote(`${pad(t.getHours())}:${pad(t.getMinutes())}　テストの予定　${minLabel(settings.notifyMin)}前だよ`,"通知はこのように届きます","test");
+  $("s-notifyst").textContent=ok?"テスト通知を送りました。届かない場合は端末の通知設定を確認してください。":"テスト通知を送れませんでした。";
+};
+const _openSet=$("setBtn").onclick;
+$("setBtn").onclick=()=>{_openSet();$("s-notify").checked=settings.notify;$("s-notifymin").value=String(settings.notifyMin);updNotifyStatus()};
+
+/* ---------- カレンダー（.ics）に書き出し ---------- */
+function icsEsc(t){return String(t||"").replace(/\\/g,"\\\\").replace(/;/g,"\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n")}
+function icsFold(line){const out=[];let cur="";for(const ch of line){if(new TextEncoder().encode(cur+ch).length>73){out.push(cur);cur=" "+ch}else cur+=ch}out.push(cur);return out.join("\r\n")}
+const icsDate=k=>k.replace(/-/g,"");
+const icsDT=(k,t)=>icsDate(k)+"T"+t.replace(":","")+"00";
+function icsFor(list){
+  const now=new Date(),stamp=now.toISOString().replace(/[-:]/g,"").replace(/\.\d+Z$/,"Z");
+  const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//nittei-techo//JA","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+    "BEGIN:VTIMEZONE","TZID:Asia/Tokyo","BEGIN:STANDARD","DTSTART:19700101T000000","TZOFFSETFROM:+0900","TZOFFSETTO:+0900","TZNAME:JST","END:STANDARD","END:VTIMEZONE"];
+  const RR={daily:"FREQ=DAILY",weekdays:"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",weekly:"FREQ=WEEKLY",biweekly:"FREQ=WEEKLY;INTERVAL=2",monthly:"FREQ=MONTHLY"};
+  for(const e of list){
+    L.push("BEGIN:VEVENT",`UID:${e.id}@nittei-techo`,`DTSTAMP:${stamp}`,`SUMMARY:${icsEsc(e.title)}`);
+    if(e.start&&!isMulti(e)){
+      L.push(`DTSTART;TZID=Asia/Tokyo:${icsDT(e.date,e.start)}`);
+      const end=e.end&&e.end>e.start?e.end:hm(toMin(e.start)+60);
+      L.push(`DTEND;TZID=Asia/Tokyo:${icsDT(e.date,end)}`);
+    }else{
+      L.push(`DTSTART;VALUE=DATE:${icsDate(e.date)}`,`DTEND;VALUE=DATE:${icsDate(addDays(endOf(e),1))}`);
+    }
+    if(e.repeat&&RR[e.repeat]){let r="RRULE:"+RR[e.repeat];if(e.repeatUntil)r+=`;UNTIL=${icsDate(e.repeatUntil)}T145959Z`;L.push(r);
+      for(const x of e.exdates||[])L.push(e.start?`EXDATE;TZID=Asia/Tokyo:${icsDT(x,e.start)}`:`EXDATE;VALUE=DATE:${icsDate(x)}`)}
+    if(e.place)L.push(`LOCATION:${icsEsc(e.place)}`);
+    const dp=departInfo({...e,_base:e,_occ:e.date});
+    const desc=[e.memo,dp?dp.text:""].filter(Boolean).join("\n");if(desc)L.push(`DESCRIPTION:${icsEsc(desc)}`);
+    if(e.start&&!isMulti(e)){const m=settings.notifyMin||60;
+      L.push("BEGIN:VALARM","ACTION:DISPLAY",`TRIGGER:-PT${m}M`,`DESCRIPTION:${icsEsc(`${e.start}　${e.title}　${minLabel(m)}前だよ`)}`,"END:VALARM")}
+    else L.push("BEGIN:VALARM","ACTION:DISPLAY","TRIGGER:-PT15H",`DESCRIPTION:${icsEsc(e.title)}`,"END:VALARM"); // 終日は前日9時
+    L.push("END:VEVENT");
+  }
+  L.push("END:VCALENDAR");
+  return L.map(icsFold).join("\r\n")+"\r\n";
+}
+function downloadICS(list,name){
+  const blob=new Blob([icsFor(list)],{type:"text/calendar;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name+".ics";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+$("icsOneBtn").onclick=()=>{if(editing)downloadICS([editing],"日程手帳-"+editing.title.slice(0,20))};
+$("s-ics").onclick=()=>{
+  const list=events.filter(e=>endOf(e)>=today||(e.repeat&&(!e.repeatUntil||e.repeatUntil>=today)));
+  if(!list.length){$("s-notifyst").textContent="書き出す予定がありません。";return}
+  downloadICS(list,"日程手帳-"+today);
+};
 
 init();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
