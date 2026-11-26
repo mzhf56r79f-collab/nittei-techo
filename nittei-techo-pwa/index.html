@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>日程手帳</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2f4a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="日程手帳">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 手帳の見開き — 左に月カレンダー、右にその日の予定。狭い画面では縦積み + 下から出る入力シート */
+:root{
+  --paper:#f6f7f9; --card:#ffffff; --ink:#1d2433; --muted:#6b7385; --line:#dde1e8;
+  --accent:#2f4a8a; --accent-soft:#e6ebf6; --sun:#c8402f; --sat:#2f6fb8;
+  --c-lab:#2f4a8a; --c-class:#2e7d5b; --c-plan:#b8752a; --c-me:#9a4a8c;
+  --display:"Zen Old Mincho","Hiragino Mincho ProN",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12151c; --card:#1a1f29; --ink:#e7eaf0; --muted:#98a0b2; --line:#2c3341;
+  --accent:#8fa8e6; --accent-soft:#232c42; --sun:#ef7a69; --sat:#79aef0;
+  --c-lab:#8fa8e6; --c-class:#6cc39b; --c-plan:#e3a75e; --c-me:#d690c8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12151c; --card:#1a1f29; --ink:#e7eaf0; --muted:#98a0b2; --line:#2c3341;
+  --accent:#8fa8e6; --accent-soft:#232c42; --sun:#ef7a69; --sat:#79aef0;
+  --c-lab:#8fa8e6; --c-class:#6cc39b; --c-plan:#e3a75e; --c-me:#d690c8; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+html,body{margin:0}
+body{padding-top:calc(20px + env(safe-area-inset-top,0px)) !important;-webkit-tap-highlight-color:transparent}
+.tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tools .ghost{font-size:.78rem;padding:4px 10px}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:20px;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}
+@media (max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}}
+
+header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.35rem;letter-spacing:.06em;margin:0}
+.sync{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sync.ok .dot{background:var(--c-class)}
+
+.cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.month{font-family:var(--display);font-size:1.6rem;margin:0;font-variant-numeric:tabular-nums}
+.month small{font-size:.9rem;color:var(--muted);margin-right:6px;font-family:var(--mono)}
+.nav{display:flex;gap:6px}
+.nav button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:4px 10px;min-height:34px}
+.nav button:hover{background:var(--accent-soft)}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.dow{font-size:.72rem;text-align:center;color:var(--muted);padding:4px 0;letter-spacing:.1em}
+.dow.sun{color:var(--sun)}.dow.sat{color:var(--sat)}
+.day{border:none;background:transparent;border-radius:8px;min-height:62px;padding:4px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.day:hover{background:var(--accent-soft)}
+.day.out{opacity:.35}
+.day.sun .n{color:var(--sun)}.day.sat .n{color:var(--sat)}
+.day .n{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;font-size:.9rem}
+.day.today .n{border:1.5px solid var(--accent)}
+.day.sel{background:var(--accent-soft)}
+.day.sel .n{background:var(--accent);color:var(--card)}
+.marks{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;max-width:100%}
+.marks i{width:6px;height:6px;border-radius:50%;display:block}
+.marks b{font-size:.62rem;color:var(--muted);font-weight:400;line-height:6px}
+
+.agenda{display:flex;flex-direction:column;gap:14px}
+.dayhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dayhead h2{font-family:var(--display);font-size:1.3rem;margin:0}
+.dayhead span{color:var(--muted);font-size:.85rem}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ev{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--cat);border-radius:10px;padding:10px 12px;text-align:left;width:100%}
+.ev:hover{border-color:var(--cat)}
+.ev .t{font-family:var(--mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.35}
+.ev .ttl{font-weight:500;overflow-wrap:anywhere}
+.ev .meta{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
+.chip{display:inline-block;font-size:.7rem;padding:0 7px;border-radius:99px;background:var(--accent-soft);color:var(--cat);margin-right:6px;letter-spacing:.05em}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ghost{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 12px}
+.ghost:hover{border-color:var(--accent)}
+.sub{font-size:.75rem;letter-spacing:.14em;color:var(--muted);margin:6px 0 0}
+.up{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.up li button{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);padding:8px 2px}
+.up .d{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.up .x{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.fab{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--card);border:none;border-radius:99px;padding:12px 20px;font-weight:700;box-shadow:0 6px 18px rgba(20,30,60,.25);z-index:5}
+
+.overlay{position:fixed;inset:0;background:rgba(10,14,24,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-height:92%;overflow:auto}
+@media (min-width:761px){.overlay{align-items:center}.sheet{border-radius:16px}}
+.sheet h3{font-family:var(--display);margin:0 0 12px;font-size:1.2rem}
+form{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+input,select,textarea{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:16px;min-width:0;width:100%}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cats label{flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;color:var(--ink);font-size:.85rem;cursor:pointer}
+.cats input{width:auto;accent-color:var(--accent)}
+.cats label:has(input:checked){border-color:var(--cat);background:var(--accent-soft)}
+.actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:4px}
+.actions .r{display:flex;gap:8px;margin-left:auto}
+.primary{background:var(--accent);color:var(--card);border:none;border-radius:8px;padding:8px 18px;font-weight:700}
+.danger{background:transparent;color:var(--sun);border:1px solid var(--sun);border-radius:8px;padding:8px 12px}
+.err{color:var(--sun);font-size:.82rem;margin:0}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <h1 class="brand">日程手帳</h1>
+  <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+</header>
+
+<main class="wrap">
+  <section class="cal" aria-label="カレンダー">
+    <div class="calhead">
+      <h2 class="month" id="monthLabel"></h2>
+      <div class="nav">
+        <button id="prev" aria-label="前の月">‹</button>
+        <button id="todayBtn">今日</button>
+        <button id="next" aria-label="次の月">›</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="agenda" aria-label="予定">
+    <div class="dayhead"><h2 id="dayTitle"></h2><span id="dayCount"></span></div>
+    <ul class="list" id="dayList"></ul>
+    <p class="sub">これからの予定</p>
+    <ul class="up" id="upList"></ul>
+  </section>
+</main>
+
+<button class="fab" id="addBtn">＋ 予定を追加</button>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+    <h3 id="formTitle">予定を追加</h3>
+    <form id="form">
+      <label>タイトル<input id="f-title" required maxlength="80" placeholder="例：研究室ミーティング"></label>
+      <div class="row">
+        <label>日付<input id="f-date" type="date" required></label>
+        <label>場所<input id="f-place" maxlength="60" placeholder="任意"></label>
+      </div>
+      <div class="row">
+        <label>開始<input id="f-start" type="time"></label>
+        <label>終了<input id="f-end" type="time"></label>
+      </div>
+      <div class="cats" id="f-cats"></div>
+      <label>メモ<textarea id="f-memo" rows="3" maxlength="500"></textarea></label>
+      <p class="err" id="f-err" hidden></p>
+      <div class="actions">
+        <button type="button" class="danger" id="delBtn" hidden>削除</button>
+        <div class="r">
+          <button type="button" class="ghost" id="cancelBtn">キャンセル</button>
+          <button type="submit" class="primary">保存</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const CATS={lab:{name:"研究",v:"--c-lab"},class:{name:"授業",v:"--c-class"},plan:{name:"予定",v:"--c-plan"},me:{name:"個人",v:"--c-me"}};
+const WD=["日","月","火","水","木","金","土"];
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const today=ymd(new Date());
+let view=new Date(); view.setDate(1);
+let sel=today, events=[], editing=null, store=null, ready=false;
+
+/* ---------- 保存先：db（アカウントに同期）→ 使えなければこの端末 ---------- */
+const LKEY="schedule-events-v1";
+const local={
+  load(){try{return JSON.parse(localStorage.getItem(LKEY)||"[]")}catch(e){return[]}},
+  save(){try{localStorage.setItem(LKEY,JSON.stringify(events))}catch(e){}},
+  async put(ev){const i=events.findIndex(e=>e.id===ev.id);i<0?events.push(ev):events[i]=ev;this.save();render()},
+  async del(id){events=events.filter(e=>e.id!==id);this.save();render()}
+};
+function setSync(ok,text){$("sync").classList.toggle("ok",ok);$("syncText").textContent=text}
+
+function init(){
+  store=local;events=local.load();ready=true;
+  setSync(true,"この端末に保存");render();
+}
+
+/* ---------- バックアップ（JSON書き出し・読み込み） ---------- */
+$("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:"nittei-techo",version:1,events},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="日程手帳-"+today+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const j=JSON.parse(await f.text());const list=Array.isArray(j)?j:j.events;
+    if(!Array.isArray(list))throw 0;
+    let n=0;for(const ev of list){if(ev&&ev.title&&/^\d{4}-\d{2}-\d{2}$/.test(ev.date||"")){
+      const id=ev.id||("e"+Date.now().toString(36)+n);const i=events.findIndex(x=>x.id===id);
+      const clean={id,title:String(ev.title),date:ev.date,start:ev.start||"",end:ev.end||"",place:ev.place||"",memo:ev.memo||"",cat:CATS[ev.cat]?ev.cat:"plan"};
+      i<0?events.push(clean):events[i]=clean;n++}}
+    local.save();render();setSync(true,n+"件を復元しました");
+  }catch(err){setSync(false,"読み込めないファイルです")}
+  e.target.value="";
+};
+
+/* ---------- 描画 ---------- */
+function byTime(a,b){return (a.start||"").localeCompare(b.start||"")||a.title.localeCompare(b.title)}
+function eventsOn(d){return events.filter(e=>e.date===d).sort(byTime)}
+function catColor(c){return `var(${(CATS[c]||CATS.plan).v})`}
+
+function render(){
+  const y=view.getFullYear(),m=view.getMonth();
+  $("monthLabel").innerHTML=`<small>${y}</small>${m+1}月`;
+  const g=$("grid");g.textContent="";
+  WD.forEach((w,i)=>{const el=document.createElement("div");el.className="dow"+(i==0?" sun":i==6?" sat":"");el.textContent=w;g.appendChild(el)});
+  const start=new Date(y,m,1-new Date(y,m,1).getDay());
+  const weeks=Math.ceil((new Date(y,m,1).getDay()+new Date(y,m+1,0).getDate())/7);
+  for(let i=0;i<weeks*7;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
+    const b=document.createElement("button");
+    b.className="day"+(d.getMonth()!==m?" out":"")+(d.getDay()==0?" sun":d.getDay()==6?" sat":"")+(k===today?" today":"")+(k===sel?" sel":"");
+    const evs=eventsOn(k);
+    b.setAttribute("aria-label",`${d.getMonth()+1}月${d.getDate()}日 予定${evs.length}件`);
+    b.innerHTML=`<span class="n">${d.getDate()}</span><span class="marks">${evs.slice(0,3).map(e=>`<i style="background:${catColor(e.cat)}"></i>`).join("")}${evs.length>3?`<b>+${evs.length-3}</b>`:""}</span>`;
+    b.onclick=()=>{sel=k;if(d.getMonth()!==m){view=new Date(d.getFullYear(),d.getMonth(),1)}render()};
+    g.appendChild(b);
+  }
+  // 選択日
+  const sd=parse(sel);
+  $("dayTitle").textContent=`${sd.getMonth()+1}月${sd.getDate()}日（${WD[sd.getDay()]}）`;
+  const list=eventsOn(sel);
+  $("dayCount").textContent=ready?(list.length?`${list.length}件`:""):"";
+  const ul=$("dayList");ul.textContent="";
+  if(!ready){ul.innerHTML=`<li class="empty">予定を読み込んでいます…</li>`}
+  else if(!list.length){
+    const li=document.createElement("li");li.className="empty";
+    li.innerHTML=events.length?`<span>この日の予定はありません。</span>`:`<span>まだ予定がありません。右下の「予定を追加」から最初の予定を登録できます。</span>`;
+    const b=document.createElement("button");b.className="ghost";b.textContent="この日に予定を追加";b.onclick=()=>openForm(null,sel);li.appendChild(b);
+    if(!events.length){const s=document.createElement("button");s.className="ghost";s.textContent="サンプル予定を入れて試す";s.onclick=addSamples;li.appendChild(s)}
+    ul.appendChild(li);
+  }else list.forEach(e=>ul.appendChild(evItem(e)));
+  // 今後
+  const up=events.filter(e=>e.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||byTime(a,b)).slice(0,6);
+  const ol=$("upList");ol.textContent="";
+  if(ready&&!up.length){ol.innerHTML=`<li style="color:var(--muted);font-size:.85rem;padding:6px 2px">予定はまだありません</li>`}
+  up.forEach(e=>{const d=parse(e.date);const li=document.createElement("li");const b=document.createElement("button");
+    b.innerHTML=`<span class="d">${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})</span><span class="x"></span>`;
+    b.querySelector(".x").textContent=(e.start?e.start+" ":"")+e.title;
+    b.onclick=()=>{sel=e.date;view=new Date(d.getFullYear(),d.getMonth(),1);render()};li.appendChild(b);ol.appendChild(li)});
+}
+function evItem(e){
+  const li=document.createElement("li");const b=document.createElement("button");b.className="ev";b.style.setProperty("--cat",catColor(e.cat));
+  b.innerHTML=`<span class="t">${e.start?e.start+(e.end?"<br>–"+e.end:""):"終日"}</span><span><span class="ttl"></span><div class="meta"><span class="chip">${(CATS[e.cat]||CATS.plan).name}</span><span class="pl"></span></div></span>`;
+  b.querySelector(".ttl").textContent=e.title;
+  b.querySelector(".pl").textContent=[e.place,e.memo].filter(Boolean).join(" · ");
+  b.onclick=()=>openForm(e);li.appendChild(b);return li;
+}
+
+/* ---------- 入力シート ---------- */
+$("f-cats").innerHTML=Object.entries(CATS).map(([k,c])=>`<label style="--cat:var(${c.v})"><input type="radio" name="cat" id="cat-${k}" value="${k}">${c.name}</label>`).join("");
+function openForm(e,date){
+  editing=e||null;$("formTitle").textContent=e?"予定を編集":"予定を追加";
+  $("f-title").value=e?.title||"";$("f-date").value=e?.date||date||sel;$("f-place").value=e?.place||"";
+  $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";
+  $("cat-"+(e?.cat||"lab")).checked=true;$("delBtn").hidden=!e;$("f-err").hidden=true;
+  $("overlay").hidden=false;setTimeout(()=>$("f-title").focus(),50);
+}
+function closeForm(){$("overlay").hidden=true;editing=null}
+$("form").addEventListener("submit",async ev=>{
+  ev.preventDefault();
+  const s=$("f-start").value,en=$("f-end").value;
+  if(en&&!s){return showErr("終了時刻だけでなく開始時刻も入れてください。")}
+  if(s&&en&&en<s){return showErr("終了時刻は開始時刻より後にしてください。")}
+  const data={id:editing?.id||("e"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    title:$("f-title").value.trim(),date:$("f-date").value,start:s,end:en,place:$("f-place").value.trim(),
+    memo:$("f-memo").value.trim(),cat:(document.querySelector('input[name="cat"]:checked')||{}).value||"lab"};
+  if(!data.title)return showErr("タイトルを入力してください。");
+  try{await store.put(data);sel=data.date;const d=parse(data.date);view=new Date(d.getFullYear(),d.getMonth(),1);closeForm();render()}
+  catch(e){showErr("保存できませんでした。通信状態を確認してもう一度お試しください。")}
+});
+$("delBtn").onclick=async()=>{
+  const b=$("delBtn");
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="本当に削除";setTimeout(()=>{b.dataset.armed="";b.textContent="削除"},3000);return}
+  try{await store.del(editing.id);b.dataset.armed="";b.textContent="削除";closeForm()}catch(e){showErr("削除できませんでした。")}
+};
+function showErr(t){$("f-err").textContent=t;$("f-err").hidden=false}
+$("cancelBtn").onclick=closeForm;
+$("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeForm()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("overlay").hidden)closeForm()});
+$("addBtn").onclick=()=>{if(store)openForm(null,sel)};
+$("prev").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
+$("next").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
+$("todayBtn").onclick=()=>{sel=today;view=new Date();view.setDate(1);render()};
+
+async function addSamples(){
+  const off=n=>{const d=new Date();d.setDate(d.getDate()+n);return ymd(d)};
+  const s=[
+    {title:"（例）研究室ミーティング",date:off(0),start:"13:00",end:"14:30",place:"研究室",memo:"進捗スライド3枚",cat:"lab"},
+    {title:"（例）論文輪読の準備",date:off(1),start:"",end:"",place:"",memo:"",cat:"lab"},
+    {title:"（例）授業",date:off(2),start:"10:40",end:"12:10",place:"",memo:"",cat:"class"},
+    {title:"（例）友人とご飯",date:off(4),start:"19:00",end:"",place:"駅前",memo:"",cat:"me"}];
+  for(const [i,e] of s.entries()){try{await store.put({id:"sample"+i+Date.now().toString(36),...e})}catch(err){}}
+}
+init();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+
+</body>
+</html>
