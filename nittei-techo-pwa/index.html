@@ -68,7 +68,8 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 .sync.ok .dot{background:var(--c-class)}
 
 .cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.nav button{white-space:nowrap}
 .month{font-family:var(--display);font-size:1.6rem;margin:0;font-variant-numeric:tabular-nums}
 .month small{font-size:.9rem;color:var(--muted);margin-right:6px;font-family:var(--mono)}
 .nav{display:flex;gap:6px}
@@ -179,6 +180,79 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .primary{background:var(--accent);color:var(--card);border:none;border-radius:8px;padding:8px 18px;font-weight:700}
 .danger{background:transparent;color:var(--sun);border:1px solid var(--sun);border-radius:8px;padding:8px 12px}
 .err{color:var(--sun);font-size:.82rem;margin:0}
+/* 繰り返し・締め切り・交通費 */
+.chk{flex-direction:row!important;align-items:center;gap:8px!important;color:var(--ink)!important;font-size:.88rem!important}
+.chk input{width:auto;accent-color:var(--accent)}
+.opts{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.fareprev{font-size:.8rem;color:var(--muted);margin:0 0 0 26px}
+.badge{display:inline-block;font-size:.68rem;padding:0 6px;border-radius:4px;margin-left:6px;vertical-align:1px;border:1px solid currentColor}
+.badge.rep{color:var(--muted)}
+.badge.dl{color:var(--sun)}
+.ev .go{font-size:.78rem;color:var(--accent);font-weight:500;margin-top:2px}
+.ev.done .ttl{text-decoration:line-through;color:var(--muted)}
+.deadlines{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.deadlines h3{margin:0;font-size:.85rem;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.dl-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-size:.9rem}
+.dl-row input{width:18px;height:18px;accent-color:var(--accent)}
+.dl-row .nm{overflow-wrap:anywhere}
+.dl-row .nm small{display:block;color:var(--muted);font-size:.75rem}
+.dl-row .left{font-family:var(--mono);font-size:.8rem;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.dl-row .left.soon{background:var(--sun);color:var(--card)}
+.dl-row .left.over{background:transparent;color:var(--sun);border:1px solid var(--sun)}
+.dl-row.done .nm{text-decoration:line-through;color:var(--muted)}
+/* 表示切替 */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:none;background:transparent;padding:4px 10px;font-size:.8rem;min-height:30px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--card)}
+.dayhead{justify-content:space-between}
+.dayhead .l{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+/* タイムライン */
+.tl{position:relative;border-left:1px solid var(--line);margin-left:44px}
+.tl .hr{position:absolute;left:-44px;right:0;border-top:1px dashed var(--line);font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.tl .hr span{position:absolute;left:0;top:-.6em;background:var(--paper);padding-right:4px}
+.tl .blk{position:absolute;border-radius:6px;padding:3px 6px;font-size:.78rem;overflow:hidden;background:var(--accent-soft);border-left:3px solid var(--cat);color:var(--ink);text-align:left;border-top:none;border-right:none;border-bottom:none}
+.tl .blk b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl .blk small{color:var(--muted);font-family:var(--mono)}
+.tl .free{position:absolute;left:8px;right:8px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--c-class);border:1px dashed var(--c-class);border-radius:6px;opacity:.8}
+.tl .gomark{position:absolute;left:0;right:0;border-top:2px dashed var(--accent);font-size:.7rem;color:var(--accent)}
+.tl .gomark span{position:absolute;right:4px;top:-1.3em;background:var(--paper);padding:0 4px}
+.tl .nowline{position:absolute;left:-6px;right:0;border-top:2px solid var(--sun)}
+.tl .nowline::before{content:"";position:absolute;left:-3px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--sun)}
+.alldays{display:flex;gap:6px;flex-wrap:wrap}
+.alldays button{border:none;border-left:3px solid var(--cat);background:var(--accent-soft);border-radius:6px;padding:3px 8px;font-size:.8rem}
+/* 週表示 */
+.wk{display:grid;grid-template-columns:30px repeat(7,minmax(0,1fr));gap:0}
+.wk .wh{font-size:.72rem;text-align:center;padding:4px 0;border:none;background:transparent;font-family:var(--mono)}
+.wk .wh.sel{background:var(--accent-soft);border-radius:6px}
+.wk .wh.today b{color:var(--accent)}
+.wk .wh b{display:block;font-size:.95rem}
+.wk .col{position:relative;border-left:1px solid var(--line)}
+.wk .hcol{position:relative}
+.wk .hcol span{position:absolute;right:3px;font-family:var(--mono);font-size:.62rem;color:var(--muted);transform:translateY(-50%)}
+.wk .hl{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+.wk .wb{position:absolute;left:1px;right:1px;border-radius:4px;background:var(--cat);color:#fff;font-size:.62rem;padding:1px 3px;overflow:hidden;line-height:1.25;border:none;text-align:left}
+.wk .wad{grid-column:2/-1;display:flex;flex-direction:column;gap:2px;margin-bottom:4px}
+/* 次の電車 */
+.trains{display:grid;grid-template-columns:minmax(0,1fr);gap:2px 10px;font-size:.82rem;border-top:1px solid var(--line);padding-top:8px;align-items:baseline}
+.trains .ln{color:var(--muted);font-size:.75rem;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.trains .ln::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lc)}
+.trains .nx{font-family:var(--mono);font-variant-numeric:tabular-nums;display:flex;gap:14px;flex-wrap:wrap;padding-left:12px;margin-bottom:4px}
+@media (min-width:700px){.trains{grid-template-columns:auto minmax(0,1fr)}.trains .nx{padding-left:0;margin-bottom:0}}
+.trains .nx span small{font-family:var(--body);color:var(--muted);margin-left:3px}
+.trains .nx em{font-style:normal;color:var(--accent);font-size:.72rem}
+.trains h4{grid-column:1/-1;margin:0;font-size:.78rem;color:var(--muted);font-weight:500;letter-spacing:.06em}
+/* 交通費 */
+.costsum{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.costsum .big{font-family:var(--mono);font-size:1.7rem;font-weight:500;font-variant-numeric:tabular-nums}
+.costcats{display:flex;gap:6px;flex-wrap:wrap}
+.costcats span{font-size:.78rem;border-radius:99px;padding:2px 10px;background:var(--accent-soft);border-left:3px solid var(--cat)}
+.costlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.costlist li{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.85rem;align-items:baseline}
+.costlist .d{font-family:var(--mono);color:var(--muted);font-size:.78rem}
+.costlist .a{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.costlist small{display:block;color:var(--muted);font-size:.74rem}
+.mnav{display:flex;align-items:center;gap:8px}
+.mnav button{border:1px solid var(--line);background:var(--card);border-radius:8px;width:32px;height:32px}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
 </style>
 </head>
@@ -187,7 +261,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 
 <header class="top">
   <h1 class="brand">日程手帳</h1>
-  <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="fareBtn">運賃・時間</button><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
+  <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="fareBtn">運賃・時間</button><button class="ghost" id="costBtn">交通費</button><button class="ghost" id="setBtn">設定</button><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
 </header>
 
 <section class="now" aria-label="現在時刻と現在地">
@@ -206,6 +280,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
       <button class="ghost" id="locBtn" type="button">現在地を取得</button>
     </div>
     <div class="infolinks" id="nowInfo"></div>
+    <div class="trains" id="trains" aria-live="off"></div>
   </div>
 </section>
 
@@ -214,17 +289,21 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
     <div class="calhead">
       <h2 class="month" id="monthLabel"></h2>
       <div class="nav">
-        <button id="prev" aria-label="前の月">‹</button>
+        <div class="seg" role="group" aria-label="カレンダーの表示"><button type="button" id="vMonth" aria-pressed="true">月</button><button type="button" id="vWeek" aria-pressed="false">週</button></div>
+        <button id="prev" aria-label="前へ">‹</button>
         <button id="todayBtn">今日</button>
-        <button id="next" aria-label="次の月">›</button>
+        <button id="next" aria-label="次へ">›</button>
       </div>
     </div>
     <div class="grid" id="grid"></div>
   </section>
 
   <section class="agenda" aria-label="予定">
-    <div class="dayhead"><h2 id="dayTitle"></h2><span id="dayCount"></span></div>
+    <div class="deadlines" id="deadlines" hidden></div>
+    <div class="dayhead"><div class="l"><h2 id="dayTitle"></h2><span id="dayCount"></span></div>
+      <div class="seg" role="group" aria-label="予定の表示"><button type="button" id="aList" aria-pressed="true">リスト</button><button type="button" id="aTime" aria-pressed="false">タイムライン</button></div></div>
     <ul class="list" id="dayList"></ul>
+    <div id="dayTL" hidden></div>
     <p class="sub">これからの予定</p>
     <ul class="up" id="upList"></ul>
   </section>
@@ -244,6 +323,10 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
       <div class="row">
         <label>開始時刻<input id="f-start" type="time"></label>
         <label>終了時刻<input id="f-end" type="time"></label>
+      </div>
+      <div class="row">
+        <label>繰り返し<select id="f-repeat"><option value="">しない</option><option value="daily">毎日</option><option value="weekdays">平日（月〜金）</option><option value="weekly">毎週</option><option value="biweekly">隔週</option><option value="monthly">毎月（同じ日）</option></select></label>
+        <label id="f-until-l" hidden>繰り返しの終了日（任意）<input id="f-until" type="date"></label>
       </div>
       <label>場所<input id="f-place" maxlength="60" placeholder="任意（駅名を入れると行き方を調べやすくなります）"></label>
       <div class="route">
@@ -275,9 +358,15 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
         </div>
       </div>
       <label>メモ<textarea id="f-memo" rows="3" maxlength="500"></textarea></label>
+      <div class="opts">
+        <label class="chk"><input type="checkbox" id="f-deadline">締め切りとして扱う（カウントダウンを表示）</label>
+        <label class="chk"><input type="checkbox" id="f-fare">交通費として記録する</label>
+        <label class="chk" id="f-round-l" hidden><input type="checkbox" id="f-round" checked>往復で計算する</label>
+        <p class="fareprev" id="f-fareprev"></p>
+      </div>
       <p class="err" id="f-err" hidden></p>
       <div class="actions">
-        <button type="button" class="danger" id="delBtn" hidden>削除</button>
+        <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="danger" id="delOneBtn" hidden>この回だけ削除</button><button type="button" class="danger" id="delBtn" hidden>削除</button></span>
         <div class="r">
           <button type="button" class="ghost" id="cancelBtn">キャンセル</button>
           <button type="submit" class="primary">保存</button>
@@ -299,6 +388,32 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
       </div>
       <div id="fa-result"></div>
       <div class="actions"><div class="r"><button type="button" class="ghost" id="fa-close">閉じる</button></div></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="setOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <h3 id="setTitle">設定</h3>
+    <form id="setForm" onsubmit="return false">
+      <p class="hint">出発時刻と交通費の計算に使います。</p>
+      <div class="row">
+        <label>最寄り駅<select id="s-home"></select></label>
+        <label>家から駅まで（徒歩・分）<input id="s-walk" type="number" min="0" max="90" step="1" inputmode="numeric"></label>
+      </div>
+      <p class="hint">最寄り駅が柏のときは、実際の時刻表から乗る電車まで出します。それ以外の駅では所要時間から目安を出します。</p>
+      <div class="actions"><div class="r"><button type="button" class="primary" id="s-close">閉じる</button></div></div>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="costOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="costTitle">
+    <h3 id="costTitle">交通費</h3>
+    <form onsubmit="return false" style="gap:12px">
+      <div class="mnav"><button type="button" id="c-prev" aria-label="前の月">‹</button><b id="c-month"></b><button type="button" id="c-next" aria-label="次の月">›</button></div>
+      <div id="c-body"></div>
+      <div class="actions"><div class="r"><button type="button" class="ghost" id="c-close">閉じる</button></div></div>
     </form>
   </div>
 </div>
@@ -394,6 +509,7 @@ function getCat(id){if(CATS[id])return{id,name:CATS[id].name,color:`var(${CATS[i
   const c=customCats.find(x=>x.id===id);return c?{id,name:c.name,color:c.color,builtin:false}:{id:"plan",name:CATS.plan.name,color:`var(${CATS.plan.v})`,builtin:true}}
 function allCats(){return[...Object.keys(CATS).map(getCat),...customCats.map(c=>getCat(c.id))]}
 const WD=["日","月","火","水","木","金","土"];
+const REPEAT_LABEL={daily:"毎日",weekdays:"平日",weekly:"毎週",biweekly:"隔週",monthly:"毎月"};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,"0");
 const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -432,7 +548,10 @@ $("importFile").onchange=async e=>{
     if(Array.isArray(j.categories)){for(const c of j.categories){if(c&&c.id&&c.name&&/^#[0-9a-f]{6}$/i.test(c.color||"")&&!CATS[c.id]&&!customCats.some(x=>x.id===c.id)){customCats.push({id:String(c.id),name:String(c.name).slice(0,12),color:c.color})}}saveCats()}
     let n=0;for(const ev of list){if(ev&&ev.title&&/^\d{4}-\d{2}-\d{2}$/.test(ev.date||"")){
       const id=ev.id||("e"+Date.now().toString(36)+n);const i=events.findIndex(x=>x.id===id);
-      const clean={id,title:String(ev.title),date:ev.date,endDate:(/^\d{4}-\d{2}-\d{2}$/.test(ev.endDate||"")&&ev.endDate>ev.date)?ev.endDate:"",start:ev.start||"",end:ev.end||"",place:ev.place||"",memo:ev.memo||"",cat:(CATS[ev.cat]||customCats.some(c=>c.id===ev.cat))?ev.cat:"plan"};
+      const clean={id,title:String(ev.title),date:ev.date,endDate:(/^\d{4}-\d{2}-\d{2}$/.test(ev.endDate||"")&&ev.endDate>ev.date)?ev.endDate:"",start:ev.start||"",end:ev.end||"",place:ev.place||"",memo:ev.memo||"",cat:(CATS[ev.cat]||customCats.some(c=>c.id===ev.cat))?ev.cat:"plan",
+        repeat:REPEAT_LABEL[ev.repeat]?ev.repeat:"",repeatUntil:/^\d{4}-\d{2}-\d{2}$/.test(ev.repeatUntil||"")?ev.repeatUntil:"",exdates:Array.isArray(ev.exdates)?ev.exdates.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)):[],
+        deadline:!!ev.deadline,doneDates:Array.isArray(ev.doneDates)?ev.doneDates.filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)):[]};
+      if(ev.fare&&typeof ev.fare.ic==="number")clean.fare={from:String(ev.fare.from||""),to:String(ev.fare.to||""),ic:+ev.fare.ic||0,tk:+ev.fare.tk||0,round:!!ev.fare.round};
       i<0?events.push(clean):events[i]=clean;n++}}
     local.save();render();setSync(true,n+"件を復元しました");
   }catch(err){setSync(false,"読み込めないファイルです")}
@@ -443,12 +562,37 @@ $("importFile").onchange=async e=>{
 const endOf=e=>e.endDate&&e.endDate>e.date?e.endDate:e.date;
 const isMulti=e=>endOf(e)!==e.date;
 function byTime(a,b){return (isMulti(b)-isMulti(a))||a.date.localeCompare(b.date)||(a.start||"").localeCompare(b.start||"")||a.title.localeCompare(b.title)}
-function eventsOn(d){return events.filter(e=>e.date<=d&&endOf(e)>=d).sort(byTime)}
+/* 繰り返し予定を期間内の各回に展開する */
+const addDays=(k,n)=>{const d=parse(k);d.setDate(d.getDate()+n);return ymd(d)};
+const dayDiff=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
+function occursOn(e,k){
+  if(k<e.date)return false;if(e.repeatUntil&&k>e.repeatUntil)return false;if((e.exdates||[]).includes(k))return false;
+  const d=parse(k),s=parse(e.date);
+  switch(e.repeat){
+    case "daily":return true;
+    case "weekdays":return d.getDay()>0&&d.getDay()<6;
+    case "weekly":return d.getDay()===s.getDay();
+    case "biweekly":return d.getDay()===s.getDay()&&(dayDiff(e.date,k)/7)%2===0;
+    case "monthly":return d.getDate()===s.getDate();
+    default:return k===e.date;
+  }
+}
+function expand(from,to){
+  const out=[];
+  for(const e of events){
+    if(!e.repeat||isMulti(e)){if(e.date<=to&&endOf(e)>=from)out.push({...e,_base:e,_occ:e.date});continue}
+    let k=e.date<from?from:e.date;const last=e.repeatUntil&&e.repeatUntil<to?e.repeatUntil:to;
+    for(let i=0;k<=last&&i<800;i++,k=addDays(k,1))if(occursOn(e,k))out.push({...e,date:k,endDate:"",_base:e,_occ:k});
+  }
+  return out;
+}
+const isDone=x=>(x._base.doneDates||[]).includes(x._occ);
+function eventsOn(d){return expand(d,d).sort(byTime)}
 const md=k=>{const d=parse(k);return (d.getMonth()+1)+"/"+d.getDate()};
 /* 1週間ぶんの予定を段（レーン）に割り当て、連日の予定が同じ高さでつながるようにする */
 function layoutWeek(keys){
   const first=keys[0],last=keys[6];
-  const evs=events.filter(e=>e.date<=last&&endOf(e)>=first).sort((a,b)=>
+  const evs=expand(first,last).sort((a,b)=>
     (isMulti(b)-isMulti(a))||a.date.localeCompare(b.date)||endOf(b).localeCompare(endOf(a))||(a.start||"").localeCompare(b.start||""));
   const lanes=[];const cells=keys.map(()=>({slots:[],hidden:0}));
   for(const e of evs){
@@ -466,6 +610,9 @@ function render(){
   const y=view.getFullYear(),m=view.getMonth();
   $("monthLabel").innerHTML=`<small>${y}</small>${m+1}月`;
   const g=$("grid");g.textContent="";
+  renderDeadlines();
+  if(calMode==="week"){renderWeek();renderAgenda();return}
+  g.className="grid";
   WD.forEach((w,i)=>{const el=document.createElement("div");el.className="dow"+(i==0?" sun":i==6?" sat":"");el.textContent=w;g.appendChild(el)});
   const start=new Date(y,m,1-new Date(y,m,1).getDay());
   const weeks=Math.ceil((new Date(y,m,1).getDay()+new Date(y,m+1,0).getDate())/7);
@@ -484,7 +631,9 @@ function render(){
     b.onclick=()=>{sel=k;if(d.getMonth()!==m){view=new Date(d.getFullYear(),d.getMonth(),1)}render()};
     g.appendChild(b);
   }
-  // 選択日
+  renderAgenda();
+}
+function renderAgenda(){
   const sd=parse(sel);
   $("dayTitle").textContent=`${sd.getMonth()+1}月${sd.getDate()}日（${WD[sd.getDay()]}）`;
   const list=eventsOn(sel);
@@ -498,8 +647,10 @@ function render(){
     if(!events.length){const s=document.createElement("button");s.className="ghost";s.textContent="サンプル予定を入れて試す";s.onclick=addSamples;li.appendChild(s)}
     ul.appendChild(li);
   }else list.forEach(e=>ul.appendChild(evItem(e)));
+  ul.hidden=agendaMode==="time";$("dayTL").hidden=agendaMode!=="time";
+  if(agendaMode==="time")renderTimeline(list);
   // 今後
-  const up=events.filter(e=>endOf(e)>=today).sort((a,b)=>a.date.localeCompare(b.date)||byTime(a,b)).slice(0,6);
+  const up=expand(today,addDays(today,90)).sort((a,b)=>a.date.localeCompare(b.date)||byTime(a,b)).slice(0,6);
   const ol=$("upList");ol.textContent="";
   if(ready&&!up.length){ol.innerHTML=`<li style="color:var(--muted);font-size:.85rem;padding:6px 2px">予定はまだありません</li>`}
   up.forEach(e=>{const d=parse(e.date);const li=document.createElement("li");const b=document.createElement("button");
@@ -512,8 +663,11 @@ function evItem(e){
   const tcol=isMulti(e)?`${md(e.date)}${e.start?" "+e.start:""}<br>–${md(endOf(e))}${e.end?" "+e.end:""}`:(e.start?e.start+(e.end?"<br>–"+e.end:""):"終日");
   b.innerHTML=`<span class="t">${tcol}</span><span><span class="ttl"></span><div class="meta"><span class="chip"></span><span class="pl"></span></div></span>`;
   b.querySelector(".ttl").textContent=e.title;b.querySelector(".chip").textContent=getCat(e.cat).name;
+  if(e.repeat){const r=document.createElement("span");r.className="badge rep";r.textContent=REPEAT_LABEL[e.repeat];b.querySelector(".ttl").after(r)}
+  if(e.deadline){const r=document.createElement("span");r.className="badge dl";r.textContent=isDone(e)?"完了":"締め切り";b.querySelector(".ttl").after(r);if(isDone(e))b.classList.add("done")}
   b.querySelector(".pl").textContent=[e.place,e.memo].filter(Boolean).join(" · ");
-  b.onclick=()=>openForm(e);li.appendChild(b);return li;
+  const dp=departInfo(e);if(dp){const g=document.createElement("div");g.className="go";g.textContent=dp.text;b.children[1].appendChild(g)}
+  b.onclick=()=>openForm(e._base||e,e._occ);li.appendChild(b);return li;
 }
 
 /* ---------- 入力シート ---------- */
@@ -553,14 +707,19 @@ function addCategory(){
 $("nc-ok").onclick=addCategory;
 $("nc-cancel").onclick=()=>{$("newCat").hidden=true};
 $("nc-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addCategory()}});
+let editingOcc=null;
 function openForm(e,date){
-  editing=e||null;$("formTitle").textContent=e?"予定を編集":"予定を追加";
+  editing=e||null;editingOcc=e&&e.repeat?date:null;$("formTitle").textContent=e?(e.repeat?"繰り返し予定を編集（すべての回）":"予定を編集"):"予定を追加";
+  $("f-repeat").value=e?.repeat||"";$("f-until").value=e?.repeatUntil||"";$("f-until-l").hidden=!$("f-repeat").value;
+  $("f-deadline").checked=!!e?.deadline;$("f-fare").checked=!!e?.fare;$("f-round").checked=e?.fare?!!e.fare.round:true;
+  $("delOneBtn").hidden=!(e&&e.repeat);
   $("f-title").value=e?.title||"";$("f-date").value=e?.date||date||sel;$("f-enddate").value=e&&isMulti(e)?e.endDate:"";$("f-place").value=e?.place||"";
   $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";resetRoute();
-  renderCats(e?(getCat(e.cat).id):"lab");$("newCat").hidden=true;$("delBtn").hidden=!e;$("f-err").hidden=true;
+  renderCats(e?(getCat(e.cat).id):"lab");$("newCat").hidden=true;$("delBtn").hidden=!e;$("delBtn").textContent=e&&e.repeat?"すべての回を削除":"削除";$("f-err").hidden=true;
+  updateFarePrev();
   $("overlay").hidden=false;setTimeout(()=>$("f-title").focus(),50);
 }
-function closeForm(){$("overlay").hidden=true;editing=null}
+function closeForm(){$("overlay").hidden=true;editing=null;editingOcc=null}
 
 /* ---------- 乗換案内 ---------- */
 const FROMKEY="schedule-from-v1";
@@ -607,9 +766,17 @@ $("form").addEventListener("submit",async ev=>{
   if(ed&&ed<sd){return showErr("終了日は開始日と同じか、それより後にしてください。")}
   const multi=ed&&ed>sd;
   if(!multi&&s&&en&&en<s){return showErr("終了時刻は開始時刻より後にしてください。")}
+  const rp=$("f-repeat").value,until=$("f-until").value;
+  if(rp&&multi){return showErr("何日も続く予定は繰り返しにできません。終了日を空けるか、繰り返しを「しない」にしてください。")}
+  if(rp&&until&&until<sd){return showErr("繰り返しの終了日は開始日より後にしてください。")}
+  let fare=null;
+  if($("f-fare").checked){const r=fareRoute($("f-place").value);if(!r)return showErr("交通費を計算できる駅が見つかりません。場所に駅名（例：船橋）を入れるか、設定で最寄り駅を確認してください。");
+    const round=$("f-round").checked;fare={from:r.from,to:r.to,ic:r.ic*(round?2:1),tk:r.tk*(round?2:1),round}}
   const data={id:editing?.id||("e"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
     title:$("f-title").value.trim(),date:sd,endDate:multi?ed:"",start:s,end:en,place:$("f-place").value.trim(),
-    memo:$("f-memo").value.trim(),cat:(document.querySelector('input[name="cat"]:checked')||{}).value||"lab"};
+    memo:$("f-memo").value.trim(),cat:(document.querySelector('input[name="cat"]:checked')||{}).value||"lab",
+    repeat:rp,repeatUntil:rp?until:"",exdates:rp?(editing?.exdates||[]):[],deadline:$("f-deadline").checked,doneDates:editing?.doneDates||[]};
+  if(fare)data.fare=fare;
   if(!data.title)return showErr("タイトルを入力してください。");
   try{await store.put(data);sel=data.date;const d=parse(data.date);view=new Date(d.getFullYear(),d.getMonth(),1);closeForm();render()}
   catch(e){showErr("保存できませんでした。通信状態を確認してもう一度お試しください。")}
@@ -617,15 +784,30 @@ $("form").addEventListener("submit",async ev=>{
 $("delBtn").onclick=async()=>{
   const b=$("delBtn");
   if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent="本当に削除";setTimeout(()=>{b.dataset.armed="";b.textContent="削除"},3000);return}
-  try{await store.del(editing.id);b.dataset.armed="";b.textContent="削除";closeForm()}catch(e){showErr("削除できませんでした。")}
+  try{await store.del(editing.id);b.dataset.armed="";closeForm()}catch(e){showErr("削除できませんでした。")}
 };
+$("delOneBtn").onclick=async()=>{
+  if(!editing||!editingOcc)return;
+  const b=$("delOneBtn");
+  if(b.dataset.armed!=="1"){b.dataset.armed="1";b.textContent=`${md(editingOcc)}の回を削除`;setTimeout(()=>{b.dataset.armed="";b.textContent="この回だけ削除"},3000);return}
+  const nb={...editing,exdates:[...(editing.exdates||[]),editingOcc]};
+  try{await store.put(nb);b.dataset.armed="";b.textContent="この回だけ削除";closeForm()}catch(e){showErr("削除できませんでした。")}
+};
+$("f-repeat").addEventListener("change",()=>{$("f-until-l").hidden=!$("f-repeat").value});
+$("f-fare").addEventListener("change",updateFarePrev);$("f-round").addEventListener("change",updateFarePrev);$("f-place").addEventListener("input",updateFarePrev);
+function updateFarePrev(){
+  const on=$("f-fare").checked;$("f-round-l").hidden=!on;
+  if(!on){$("f-fareprev").textContent="";return}
+  const r=fareRoute($("f-place").value);const k=$("f-round").checked?2:1;
+  $("f-fareprev").textContent=r?`${r.from} → ${r.to}${k===2?"（往復）":"（片道）"}　IC ${(r.ic*k).toLocaleString()}円 ／ きっぷ ${(r.tk*k).toLocaleString()}円`:"場所に駅名を入れると運賃を自動で計算します（常磐線・アーバンパークラインの駅）";
+}
 function showErr(t){$("f-err").textContent=t;$("f-err").hidden=false}
 $("cancelBtn").onclick=closeForm;
 $("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeForm()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("overlay").hidden)closeForm()});
 $("addBtn").onclick=()=>{if(store)openForm(null,sel)};
-$("prev").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
-$("next").onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
+$("prev").onclick=()=>{if(calMode==="week"){sel=addDays(sel,-7);const d=parse(sel);view=new Date(d.getFullYear(),d.getMonth(),1)}else view=new Date(view.getFullYear(),view.getMonth()-1,1);render()};
+$("next").onclick=()=>{if(calMode==="week"){sel=addDays(sel,7);const d=parse(sel);view=new Date(d.getFullYear(),d.getMonth(),1)}else view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
 $("todayBtn").onclick=()=>{sel=today;view=new Date();view.setDate(1);render()};
 
 async function addSamples(){
@@ -722,6 +904,242 @@ $("nowInfo").innerHTML=infoLinksHTML(["JR","東武"],true);
   $("fareOverlay").addEventListener("click",e=>{if(e.target.id==="fareOverlay")$("fareOverlay").hidden=true});
   document.addEventListener("keydown",e=>{if(e.key==="Escape")$("fareOverlay").hidden=true});
 })();
+
+/* ---------- 設定（最寄り駅・徒歩） ---------- */
+const SKEY="schedule-settings-v1";
+let settings=(()=>{try{return{home:"柏",walk:10,...JSON.parse(localStorage.getItem(SKEY)||"{}")}}catch(e){return{home:"柏",walk:10}}})();
+function saveSettings(){try{localStorage.setItem(SKEY,JSON.stringify(settings))}catch(e){}}
+(function(){
+  const jr=Object.keys(RAIL.jrKm),td=Object.keys(RAIL.tobuKm).filter(x=>x!=="柏");
+  $("s-home").innerHTML=`<optgroup label="常磐線">${jr.map(n=>`<option>${n}</option>`).join("")}</optgroup><optgroup label="東武アーバンパークライン">${td.map(n=>`<option>${n}</option>`).join("")}</optgroup>`;
+  $("setBtn").onclick=()=>{$("s-home").value=settings.home;$("s-walk").value=settings.walk;$("setOverlay").hidden=false};
+  const upd=()=>{settings.home=$("s-home").value;settings.walk=Math.max(0,Math.min(90,parseInt($("s-walk").value||"0",10)||0));saveSettings();render();renderTrains()};
+  $("s-home").onchange=upd;$("s-walk").oninput=upd;
+  $("s-close").onclick=()=>{$("setOverlay").hidden=true};
+  $("setOverlay").addEventListener("click",e=>{if(e.target.id==="setOverlay")$("setOverlay").hidden=true});
+})();
+function fareRoute(place){
+  const to=normStation(place);if(!RAIL_STATIONS.has(to)||to===settings.home)return null;
+  return railRoute(settings.home,to);
+}
+
+/* ---------- 柏駅の時刻表（JR東日本・東武鉄道の公式時刻表より、2026年12月時点） ---------- */
+const TT_JR={"jrR_down_wd":{"d":["取手","日立","高萩","勝田","水戸","成田","土浦","我孫子"],"t":"044410 050110 053010 053801 055910 060810 061810 063202 064010 065010 065903 070910 072203 072510 073104 073710 074415 075503 080210 080906 081810 082506 083410 084403 085610 090306 090715 091603 092610 093406 094010 094710 095606 100315 101310 102506 103706 104410 110206 110615 112306 113010 114006 115310 120206 120915 122306 123010 124006 125310 130206 130915 132306 133010 134006 135310 140206 140915 142306 143010 144004 145310 150203 150915 152304 153010 153626 154103 155310 160206 161015 162202 163010 163626 164104 165610 170206 171010 172202 173010 174103 175410 180110 180703 181610 182603 183215 183904 184410 185506 185815 190310 190903 191410 192315 192803 193310 194003 194615 195606 195910 200610 201303 202315 202806 203210 204006 204810 205604 210210 211006 211615 212703 213410 214406 215610 220403 221210 222506 223015 224003 225410 230106 231215 232303 233210 234106 234810 235910 001106 001710 002710 004017"},"jrR_down_hd":{"d":["取手","日立","高萩","勝田","水戸","成田","土浦","我孫子"],"t":"044410 050110 053010 053801 055910 061810 063202 064010 065110 065903 070910 072203 072610 073104 073810 074415 075503 080110 080906 081510 082406 083010 083910 084710 085603 090215 091010 091603 092810 093410 094006 094510 095606 100115 100610 101406 102510 103610 104006 105517 110206 110715 112306 113010 114006 115310 120206 120915 122306 123010 124006 125310 130206 130915 132306 133010 134006 135310 140206 140915 142306 143010 144004 145310 150203 151015 152304 153010 153626 154103 155310 160206 161015 162202 163010 163626 164104 165515 170206 171010 172202 173110 174003 175410 180203 180810 181503 182615 183110 183904 184815 185606 190110 190903 192215 192703 193110 193903 194510 195606 200110 201203 202210 202706 203115 203906 204510 205604 210210 211006 211515 212703 213410 214406 215610 220403 221210 222506 223015 224003 225410 230106 231215 232303 233210 234106 234810 235910 001106 001710 002710 004017"},"jrR_up_wd":{"d":["上野","品川","松戸"],"t":"045610 051510 053610 054610 055701 060510 061710 062400 063210 064010 064910 065401 070110 070611 071000 071510 071801 072300 072611 073311 073710 074101 074611 075000 075411 075701 080110 080700 081110 081501 082010 082600 083410 084201 085110 090001 091010 091801 092810 093221 093910 094801 095810 100801 102010 102800 103221 104010 105301 110210 110901 112010 113201 114010 115301 120210 121001 122010 123201 124110 125301 130210 131001 132010 133201 134110 135301 140210 141001 142010 143201 144110 145301 150210 151001 152010 153201 154110 155101 160110 160910 162101 162900 164010 165001 165711 170300 171010 172101 173010 173900 174910 175601 180610 181000 182010 182701 183310 183711 184200 185310 185701 190510 190911 191200 192211 192801 193410 193900 195211 195901 200910 202101 203111 203700 204211 205401 210410 211200 212611 213501 214810 220001 221310 222600 223510 224900 225800 230510 231310 232300 233410 234610 235710 000610 001712 003012"},"jrR_up_hd":{"d":["上野","品川","松戸"],"t":"045610 051510 053610 054610 055701 060510 061710 062400 063210 064010 064910 065401 070110 070700 071310 072000 072411 073110 073610 074201 074710 075411 075900 080610 081201 081610 082110 082601 083310 084101 084810 085601 090210 090901 091510 092001 092710 093221 093910 094710 095301 100110 101001 102010 102800 103221 104010 105301 110210 110901 112010 113201 113910 115301 120210 121001 122010 123201 124110 125301 130210 131001 132010 133201 134110 135301 140210 141001 142010 143201 144110 145301 150210 151001 152010 153201 154110 155301 160510 161101 162210 162900 164011 164901 165610 170500 171010 172201 173111 173900 174910 175401 175911 180500 181210 182411 183201 184000 184910 185601 190111 190710 191300 192211 192901 193900 195210 195901 200911 202001 202710 203211 203700 204211 205401 210410 211200 212611 213501 214810 220001 221310 222600 223510 224900 225800 230510 231310 232300 233410 234610 235710 000610 001712 003012"},"jrL_down_wd":{"d":["我孫子","取手"],"t":"045800 052400 054400 060401 061001 061701 063101 063601 064100 064601 065201 065801 070801 071301 072401 073301 074301 075300 080300 081000 081900 083000 084100 085100 085800 090600 091300 092200 093100 093700 094300 095200 100000 100800 101800 102700 103600 104600 105500 110500 111400 112400 113400 114400 115400 120400 121400 122400 123400 124400 125400 130400 131400 132400 133400 134400 135400 140400 141400 142400 143400 144400 145400 150400 151400 152400 153400 154400 155400 160400 161400 162400 163500 164500 165500 170500 171300 172000 172800 173900 174500 175201 175800 180901 181400 182401 182900 183701 184300 185101 185500 190401 191100 191801 192300 193001 193501 194401 195401 200800 201900 202600 203000 203600 204200 204700 205200 210100 210500 212100 212800 213600 214500 215300 220100 221000 222000 222500 223700 224800 225800 230600 231900 232500 233500 234300 235300 000200 001300 002500 003600 004300 005100"},"jrL_down_hd":{"d":["我孫子"],"t":"045800 052300 054400 060400 061900 063700 064400 065500 070400 071100 072000 073000 073600 074600 075600 080500 081200 082100 082700 083600 084500 085200 090100 090900 091600 092500 093600 094100 094900 095600 100400 101100 102000 102900 103600 104400 105100 105600 110400 111400 112400 113400 114400 115400 120400 121400 122400 123400 124400 125400 130400 131400 132400 133400 134400 135400 140400 141400 142400 143400 144500 145600 150600 151600 152600 153600 154600 155600 160600 161600 162600 163600 164600 165600 170600 171600 172600 173600 174600 175600 180600 181600 182600 183400 184400 185400 190500 191500 192800 193700 194500 195600 200600 201600 202700 203800 204700 205600 210700 211800 213000 214200 214900 215700 220600 221500 222400 223400 224300 225300 230300 231700 233500 235500 001100 002500 003600 005100"},"jrL_up_wd":{"d":["代々木上原","向ヶ丘遊園","霞ケ関","成城学園前","明治神宮前","唐木田","伊勢原","本厚木","北千住","松戸"],"t":"043500 045800 051700 054200 060301 061701 062400 063302 063903 064602 065103 065600 070003 070303 070600 070903 071200 071600 071901 072204 072503 072800 073101 073603 074004 074403 074700 075003 075300 075600 080304 080700 081201 081700 082500 083100 084103 085100 090004 091003 091900 092600 093400 094205 095200 100205 101300 102205 103200 104205 105200 110205 111200 112205 113200 114205 115200 120205 121200 122205 123200 124205 125200 130205 131200 132205 133200 134205 135200 140205 141200 142205 143200 144205 145200 150201 151203 152300 153300 154203 155300 160300 161203 162201 163203 164201 165201 170106 171300 172000 172800 173303 174101 174800 175800 180700 181600 182100 182900 183403 183800 184101 184800 185400 190000 190506 190800 191303 191600 192101 192400 192801 193200 193800 194203 194600 195107 195700 200206 200600 201103 201500 202006 202500 202901 203400 204003 204600 205400 210200 211000 212006 212600 213200 214200 214906 215600 220600 221500 222700 223900 224700 225500 230600 231700 232600 234000 000208 001809 003509"},"jrL_up_hd":{"d":["代々木上原","向ヶ丘遊園","成城学園前","唐木田","伊勢原","霞ケ関","北千住","松戸"],"t":"043500 045800 051700 053800 054700 055500 060500 061500 062301 063200 064600 065300 065900 070401 071300 071900 072800 073400 073902 074902 075500 080000 080700 081500 082400 083000 083600 084102 084802 085701 090500 091400 092202 093000 093801 094500 095500 100500 101400 102300 103200 104203 105200 110203 111200 112203 113200 114203 115200 120203 121200 122203 123200 124203 125200 130203 131200 132203 133200 134203 135200 140203 141200 142203 143200 144203 145400 150501 151500 152501 153500 154501 155500 160501 161500 162501 163500 164502 165500 170501 171500 172500 173500 174500 175500 180500 181500 182500 183502 184600 185200 190201 191200 192300 193400 194600 195600 200600 201500 202500 203400 204800 205904 211500 212800 213900 215500 221000 222500 223400 224300 225600 231400 232600 233905 000206 001807 003507"}};
+const TT_TB={"td_up_wd":{"d":["大宮","運河","七光台","岩槻","春日部"],"t":"051300 053300 054700 055800 061000 062200 063200 064000 064601 065200 070100 070900 071500 072101 072700 073200 073901 074400 075101 075600 080202 080800 081600 082120 082701 083102 083800 084202 084920 085502 090100 090700 091502 092210 092802 093300 093900 094801 095610 100100 101200 102400 103001 103810 104400 105400 110101 110810 111400 112400 113101 113810 114400 115400 120101 120810 121400 122400 123101 123810 124400 125400 130101 130810 131400 132400 133101 133810 134400 135400 140101 140810 141400 142400 143101 143810 144400 145400 150101 150810 151400 152400 153001 153810 154400 155500 160610 160900 161501 162300 163500 164200 165000 170000 170702 171400 172100 173100 174100 174701 175200 180200 180800 181400 182100 182900 183700 184400 185200 190000 190600 191400 192200 192902 193600 194400 195200 200200 201200 202400 203200 204200 205200 210200 211300 212200 213200 214300 215400 220500 221402 222500 223500 224600 225702 230800 232000 233000 234002 235003 000204 001602 002602 003802 005002"},"td_up_hd":{"d":["大宮","運河","七光台","岩槻","春日部"],"t":"051300 053300 055100 060800 062200 063100 063601 064200 065220 070100 070900 071501 072100 073000 073700 074401 075320 080000 080702 081300 082220 083100 084100 084800 085820 090800 091900 092700 093810 094101 095200 095901 100810 101400 102400 103001 103810 104400 105400 110101 110810 111400 112400 113101 113810 114400 115400 120101 120810 121400 122400 123101 123810 124400 125400 130101 130810 131400 132400 133101 133810 134400 135400 140101 140810 141400 142400 143101 143810 144400 145400 150101 150810 151400 152400 153101 153810 154400 155500 160101 160810 161400 162400 163001 163810 164200 165300 170520 171100 172000 172802 173520 174200 175300 180520 181400 182500 183520 184500 185500 190520 191500 192500 193520 194500 195600 200720 201500 202500 203500 204500 205500 210500 211500 212400 213500 214900 220500 222000 223500 225000 230800 231903 233004 234502 000202 001602 002602"},"td_down_wd":{"d":["船橋","高柳"],"t":"050200 052700 053500 054300 055100 055900 060400 061300 062000 062500 063120 063500 064300 064900 065400 070020 070300 070800 071300 071900 072500 073120 073400 074200 074700 075200 075600 080220 080600 081100 081600 082100 082600 083220 083600 084600 085700 090600 091110 091600 092600 093400 094010 094900 095900 100600 101210 101800 102800 103600 104210 104800 105800 110600 111210 111800 112800 113600 114210 114800 115800 120600 121210 121800 122800 123600 124210 124800 125800 130600 131210 131800 132800 133600 134210 134800 135800 140600 141210 141800 142800 143600 144210 144800 145800 150600 151210 151800 152800 153600 154210 154800 155800 160600 161210 161800 162800 163500 164210 164600 165700 170500 171210 171600 172800 173500 174210 174600 175400 180500 181110 181600 182600 183500 184110 184700 185700 190500 191110 191700 192700 193500 194110 194700 195600 200500 201110 201700 202600 203400 204110 204900 205600 210400 211110 211800 212700 213400 214110 214800 215700 220500 221110 221600 222600 223500 224400 225101 225800 231000 232100 233600 235300 000800 002300 003801 005601"},"td_down_hd":{"d":["船橋","高柳"],"t":"050200 052700 053500 054700 055900 060700 061500 062500 063010 063400 064500 065400 070010 070400 071000 071500 072400 073010 073500 074000 074600 075400 080010 080400 081200 082200 083010 083200 084100 084900 090000 090500 091110 091700 092600 093400 094010 094500 095600 100600 101210 101800 102800 103600 104210 104800 105800 110600 111210 111800 112800 113600 114210 114800 115800 120600 121210 121800 122800 123600 124210 124800 125800 130600 131210 131800 132800 133600 134210 134800 135800 140600 141210 141800 142800 143600 144210 144800 145800 150600 151210 151800 152800 153600 154210 154800 155800 160600 161210 161800 162800 163500 164210 164600 165600 170500 171210 171700 172600 173500 174210 174800 175800 180500 181110 181700 182700 183500 184110 184600 185600 190500 191110 191700 192700 193500 194110 194700 195600 200500 201110 201700 202700 203500 204110 204700 205700 210500 211110 211700 212700 213500 214110 214700 215700 220500 221110 221900 222700 223500 224301 225100 230200 231001 232000 233600 235300 000800 002300"}};
+const TT_UPDATED="2026年12月";
+// 祝日（土休日ダイヤ）。年末年始 12/30〜1/3 も土休日ダイヤとして扱う
+const HOLIDAYS=new Set(["2026-01-01","2026-01-02","2026-01-03","2026-01-12","2026-02-11","2026-02-23","2026-03-20","2026-04-29","2026-05-03","2026-05-04","2026-05-05","2026-05-06","2026-07-20","2026-08-11","2026-09-21","2026-09-22","2026-09-23","2026-10-12","2026-11-03","2026-11-23","2026-12-30","2026-12-31",
+  "2027-01-01","2027-01-02","2027-01-03","2027-01-11","2027-02-11","2027-02-23","2027-03-22","2027-04-29","2027-05-03","2027-05-04","2027-05-05","2027-07-19","2027-08-11","2027-09-20","2027-09-23","2027-10-11","2027-11-03","2027-11-23","2027-12-30","2027-12-31"]);
+const isHolidaySchedule=k=>{const d=parse(k).getDay();return d===0||d===6||HOLIDAYS.has(k)};
+const TT_CACHE={};
+function ttList(key){ // [{min, type, dest}] min は 0時起点（深夜0〜3時台は +24時）
+  if(TT_CACHE[key])return TT_CACHE[key];
+  const src=TT_JR[key]||TT_TB[key];
+  return TT_CACHE[key]=src.t.split(" ").map(x=>{let h=+x.slice(0,2);const m=+x.slice(2,4);if(h<4)h+=24;return{min:h*60+m,type:+x[4],dest:src.d[parseInt(x[5],36)]}});
+}
+// 柏から各方面へ走る系統の定義
+const KASHIWA_LINES=[
+  {key:"jrR_up",label:"常磐線快速 上野・品川方面",co:"JR",svc:"jrR",dir:-1,types:["普通","快速","特別快速"]},
+  {key:"jrR_down",label:"常磐線快速 我孫子・取手方面",co:"JR",svc:"jrR",dir:1,types:["普通","快速","特別快速"]},
+  {key:"jrL_up",label:"各駅停車 松戸・千代田線方面",co:"JR",svc:"jrL",dir:-1,types:["各停"]},
+  {key:"jrL_down",label:"各駅停車 我孫子・取手方面",co:"JR",svc:"jrL",dir:1,types:["各停"]},
+  {key:"td_up",label:"アーバンパークライン 大宮方面",co:"東武",svc:"td",dir:-1,types:["普通","急行","区間急行"]},
+  {key:"td_down",label:"アーバンパークライン 船橋方面",co:"東武",svc:"td",dir:1,types:["普通","急行","区間急行"]}
+];
+const TOBU_EXP=new Set(RAIL.services[3].stops);
+const TOBU_SEMI=new Set([...TOBU_EXP,"江戸川台","初石","豊四季","塚田","新船橋"]);
+const TOKKAI=new Set(["上野","日暮里","北千住","松戸","柏","我孫子","取手"]);
+function kmOf(co,st){return co==="JR"?RAIL.jrKm[st]:RAIL.tobuKm[st]}
+// その電車で target 駅まで行けるか（行先・停車駅）
+function trainServes(line,tr,target){
+  const tk=kmOf(line.co,target),hk=kmOf(line.co,"柏");if(tk===undefined)return false;
+  if(Math.sign(tk-hk)!==line.dir)return false;
+  const dk=kmOf(line.co,tr.dest);if(dk!==undefined&&(line.dir>0?tk>dk:tk<dk))return false;
+  if(line.co==="東武"){if(tr.type===1&&!TOBU_EXP.has(target))return false;if(tr.type===2&&!TOBU_SEMI.has(target))return false}
+  if(line.svc==="jrR"&&tr.type===2&&!TOKKAI.has(target))return false;
+  if(line.co==="JR"&&segMinutes(line.svc,"柏",target)==null)return false; // 快速は各駅停車だけの駅に止まらない
+  return true;
+}
+function segMinutes(svcId,a,b){
+  const sv=RAIL.services.find(x=>x.id===svcId);const q=sv.seq;let ia=-1,ib=-1;
+  for(let i=0;i<q.length;i+=2){if(q[i]===a)ia=i;if(q[i]===b)ib=i}
+  if(ia<0||ib<0)return null;let t=0;for(let i=Math.min(ia,ib);i<Math.max(ia,ib);i+=2)t+=q[i+1];return t;
+}
+function rideMinutes(line,tr,target){
+  if(line.co==="東武"){const loc=segMinutes("td","柏",target);const ex=segMinutes("tdx","柏",target);return tr.type===1&&ex!=null?ex:tr.type===2&&ex!=null?Math.round((ex+loc)/2):loc}
+  return segMinutes(line.svc==="jrR"?"jrR":"jrL","柏",target);
+}
+const hm=min=>{min=((Math.round(min)%1440)+1440)%1440;return pad(Math.floor(min/60))+":"+pad(min%60)};
+const TYPE_NAME={JR:["普通","快速","特別快速"],"東武":["普通","急行","区間急行"]};
+/* 予定に間に合う出発時刻 */
+function departInfo(x){
+  if(!x.start||isMulti(x))return null;
+  const to=normStation(x.place);if(!RAIL_STATIONS.has(to)||to===settings.home)return null;
+  const r=railRoute(settings.home,to);if(!r)return null;
+  const [sh,sm]=x.start.split(":").map(Number);const startMin=sh*60+sm;
+  const walk=settings.walk||0;
+  if(settings.home==="柏"){
+    const first=r.legs[0];const rest=r.minutes-first.min;const hd=isHolidaySchedule(x.date);
+    let best=null;
+    for(const line of KASHIWA_LINES){
+      if(line.co!==first.co)continue;
+      if(line.co==="JR"&&!(first.line.includes("快速")?line.svc==="jrR":true))continue;
+      const list=ttList(line.key+(hd?"_hd":"_wd"));
+      for(const tr of list){if(tr.min>startMin)break;if(!trainServes(line,tr,first.to))continue;
+        const ride=rideMinutes(line,tr,first.to);if(ride==null)continue;
+        const arr=tr.min+ride+rest;
+        if(arr<=startMin&&(!best||tr.min>best.tr.min))best={tr,line,arr}}
+    }
+    if(best){const tn=TYPE_NAME[best.line.co][best.tr.type]||"";
+      return{leave:best.tr.min-walk,train:best.tr.min,arr:best.arr,text:`家を${hm(best.tr.min-walk)}に出発 → 柏${hm(best.tr.min)}発 ${tn} ${best.tr.dest}行（${to}着 ${hm(best.arr)}ごろ）`}}
+  }
+  const leave=startMin-r.minutes-walk-5;
+  return{leave,train:startMin-r.minutes-5,arr:startMin,text:`家を${hm(leave)}ごろに出発（${settings.home}→${to} 約${r.minutes}分＋待ち時間の目安）`};
+}
+
+/* ---------- 柏駅の次の電車 ---------- */
+function renderTrains(){
+  const el=$("trains");if(!el)return;
+  const now=new Date();let k=ymd(now);let nm=now.getHours()*60+now.getMinutes();
+  if(now.getHours()<4){k=ymd(new Date(now.getTime()-864e5));nm+=1440} // 深夜は前日のダイヤ
+  const hd=isHolidaySchedule(k);
+  const rows=KASHIWA_LINES.map(line=>{
+    const list=ttList(line.key+(hd?"_hd":"_wd")).filter(t=>t.min>=nm).slice(0,2);
+    const lc=RAIL_INFO[line.co].color;
+    const nx=list.length?list.map(t=>{const tn=TYPE_NAME[line.co][t.type];const left=t.min-nm;
+      return `<span>${hm(t.min)}<small>${line.svc==="jrL"?"":tn+" "}${t.dest}</small> <em>${left<=0?"まもなく":left+"分後"}</em></span>`}).join(""):'<span><small>本日の運転は終了しました</small></span>';
+    return `<span class="ln" style="--lc:${lc}">${line.label}</span><span class="nx">${nx}</span>`;
+  }).join("");
+  el.innerHTML=`<h4>柏駅の次の電車（${hd?"土休日":"平日"}ダイヤ・特急を除く）</h4>${rows}`;
+}
+renderTrains();setInterval(renderTrains,20000);
+
+/* ---------- 締め切り ---------- */
+function renderDeadlines(){
+  const box=$("deadlines");
+  const items=expand(addDays(today,-14),addDays(today,120)).filter(x=>x.deadline&&!(x._occ<today&&isDone(x)));
+  const pending=items.filter(x=>!isDone(x)).sort((a,b)=>a.date.localeCompare(b.date)||(a.start||"99").localeCompare(b.start||"99"));
+  const doneRecent=items.filter(x=>isDone(x)&&x.date>=today).slice(0,3);
+  const list=[...pending.slice(0,6),...doneRecent];
+  if(!list.length){box.hidden=true;return}
+  box.hidden=false;box.innerHTML='<h3>締め切り</h3>';
+  for(const x of list){
+    const n=dayDiff(today,x.date);const done=isDone(x);
+    const row=document.createElement("label");row.className="dl-row"+(done?" done":"");
+    const cb=document.createElement("input");cb.type="checkbox";cb.checked=done;cb.setAttribute("aria-label",x.title+"を完了にする");
+    cb.onchange=async()=>{const b=x._base;const dd=new Set(b.doneDates||[]);cb.checked?dd.add(x._occ):dd.delete(x._occ);try{await store.put({...b,doneDates:[...dd]})}catch(e){}};
+    const nm=document.createElement("span");nm.className="nm";nm.textContent=x.title;
+    const sm=document.createElement("small");sm.textContent=`${md(x.date)}（${WD[parse(x.date).getDay()]}）${x.start?" "+x.start:""}まで`;nm.appendChild(sm);
+    const left=document.createElement("span");left.className="left"+(done?"":n<0?" over":n<=2?" soon":"");
+    left.textContent=done?"完了":n<0?`${-n}日超過`:n===0?"今日":`あと${n}日`;
+    row.append(cb,nm,left);box.appendChild(row);
+  }
+}
+
+/* ---------- 表示モード ---------- */
+const VKEY="schedule-view-v1";
+let calMode="month",agendaMode="list";
+try{const o=JSON.parse(localStorage.getItem(VKEY)||"{}");if(o.cal==="week")calMode="week";if(o.agenda==="time")agendaMode="time"}catch(e){}
+function setModes(){
+  $("vMonth").setAttribute("aria-pressed",String(calMode==="month"));$("vWeek").setAttribute("aria-pressed",String(calMode==="week"));
+  $("aList").setAttribute("aria-pressed",String(agendaMode==="list"));$("aTime").setAttribute("aria-pressed",String(agendaMode==="time"));
+  try{localStorage.setItem(VKEY,JSON.stringify({cal:calMode,agenda:agendaMode}))}catch(e){}
+}
+$("vMonth").onclick=()=>{calMode="month";setModes();render()};
+$("vWeek").onclick=()=>{calMode="week";setModes();render()};
+$("aList").onclick=()=>{agendaMode="list";setModes();renderAgenda()};
+$("aTime").onclick=()=>{agendaMode="time";setModes();renderAgenda()};
+setModes();
+const toMin=t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+function lanesFor(items){ // 時間が重なる予定を横に並べる
+  const cols=[];for(const it of items){let c=0;while(cols[c]&&cols[c]>it.s)c++;cols[c]=it.e;it.col=c}
+  const n=Math.max(1,cols.length);items.forEach(it=>it.n=n);return items;
+}
+function renderTimeline(list){
+  const box=$("dayTL");box.textContent="";
+  const allday=list.filter(x=>!x.start||isMulti(x));
+  const timed=list.filter(x=>x.start&&!isMulti(x)).map(x=>({x,s:toMin(x.start),e:x.end?Math.max(toMin(x.end),toMin(x.start)+15):toMin(x.start)+60})).sort((a,b)=>a.s-b.s);
+  if(allday.length){const ad=document.createElement("div");ad.className="alldays";
+    for(const x of allday){const b=document.createElement("button");b.style.setProperty("--cat",catColor(x.cat));b.textContent=(isMulti(x)?"〜"+md(endOf(x))+" ":"終日 ")+x.title;b.onclick=()=>openForm(x._base,x._occ);ad.appendChild(b)}
+    box.appendChild(ad)}
+  const deps=timed.map(t=>departInfo(t.x)).filter(Boolean);
+  let h0=7,h1=22;for(const t of timed){h0=Math.min(h0,Math.floor(t.s/60));h1=Math.max(h1,Math.ceil(t.e/60))}
+  for(const d of deps)h0=Math.min(h0,Math.floor(d.leave/60));
+  h0=Math.max(0,h0);h1=Math.min(24,h1);
+  const PX=52,y=min=>(min-h0*60)*PX/60;
+  const tl=document.createElement("div");tl.className="tl";tl.style.height=((h1-h0)*PX)+"px";
+  for(let h=h0;h<=h1;h++){const l=document.createElement("div");l.className="hr";l.style.top=y(h*60)+"px";l.innerHTML=`<span>${pad(h)}:00</span>`;tl.appendChild(l)}
+  // 空き時間（8:00〜22:00 の間で30分以上）
+  let cur=Math.max(h0*60,8*60);const endDay=Math.min(h1*60,22*60);
+  for(const t of [...timed,{s:endDay,e:endDay}]){if(t.s-cur>=30&&cur<endDay){const f=document.createElement("div");f.className="free";const a=cur,b=Math.min(t.s,endDay);
+      f.style.top=(y(a)+2)+"px";f.style.height=Math.max(14,y(b)-y(a)-4)+"px";const len=b-a;f.textContent=`空き ${len>=60?Math.floor(len/60)+"時間":""}${len%60?len%60+"分":""}`;tl.appendChild(f)}
+    cur=Math.max(cur,t.e)}
+  for(const t of lanesFor(timed)){const b=document.createElement("button");b.className="blk";b.style.setProperty("--cat",catColor(t.x.cat));
+    b.style.top=(y(t.s)+1)+"px";b.style.height=Math.max(20,y(t.e)-y(t.s)-2)+"px";
+    b.style.left=`calc(${t.col*100/t.n}% + 4px)`;b.style.width=`calc(${100/t.n}% - 8px)`;
+    b.innerHTML=`<b></b><small>${t.x.start}${t.x.end?"–"+t.x.end:""}</small>`;b.querySelector("b").textContent=t.x.title;
+    b.onclick=()=>openForm(t.x._base,t.x._occ);tl.appendChild(b)}
+  for(const d of deps){if(d.leave<h0*60)continue;const g=document.createElement("div");g.className="gomark";g.style.top=y(d.leave)+"px";g.innerHTML=`<span>${hm(d.leave)} 家を出る</span>`;tl.appendChild(g)}
+  if(sel===today){const n=new Date();const nm=n.getHours()*60+n.getMinutes();if(nm>=h0*60&&nm<=h1*60){const l=document.createElement("div");l.className="nowline";l.style.top=y(nm)+"px";tl.appendChild(l)}}
+  if(!list.length){const p=document.createElement("p");p.className="hint";p.textContent="この日の予定はありません。";box.appendChild(p)}
+  box.appendChild(tl);
+}
+function renderWeek(){
+  const g=$("grid");g.className="wk";g.textContent="";
+  const sd=parse(sel);const ws=addDays(sel,-sd.getDay());const keys=[...Array(7)].map((_,i)=>addDays(ws,i));
+  const a=parse(keys[0]),b=parse(keys[6]);
+  $("monthLabel").innerHTML=`<small>${a.getFullYear()}</small>${a.getMonth()+1}/${a.getDate()}–${a.getMonth()===b.getMonth()?"":b.getMonth()+1+"/"}${b.getDate()}`;
+  const items=expand(keys[0],keys[6]);
+  const timed=items.filter(x=>x.start&&!isMulti(x));
+  let h0=8,h1=21;for(const x of timed){h0=Math.min(h0,Math.floor(toMin(x.start)/60));h1=Math.max(h1,Math.ceil((x.end?toMin(x.end):toMin(x.start)+60)/60))}
+  h1=Math.min(24,h1);const PX=26,H=(h1-h0)*PX,y=min=>(min-h0*60)*PX/60;
+  g.appendChild(document.createElement("div"));
+  for(const k of keys){const d=parse(k);const b=document.createElement("button");b.className="wh"+(k===sel?" sel":"")+(k===today?" today":"");
+    b.innerHTML=`${WD[d.getDay()]}<b>${d.getDate()}</b>`;b.onclick=()=>{sel=k;render()};g.appendChild(b)}
+  const ad=items.filter(x=>!x.start||isMulti(x));
+  if(ad.length){const w=document.createElement("div");w.className="wad";w.style.display="grid";w.style.gridTemplateColumns="repeat(7,minmax(0,1fr))";
+    for(const x of ad){const c0=Math.max(0,keys.indexOf(x.date<keys[0]?keys[0]:x.date)),c1=endOf(x)>keys[6]?6:keys.indexOf(endOf(x));
+      const bt=document.createElement("button");bt.className="wb";bt.style.position="static";bt.style.gridColumn=`${c0+1}/${c1+2}`;bt.style.setProperty("--cat",catColor(x.cat));bt.textContent=x.title;bt.onclick=()=>openForm(x._base,x._occ);w.appendChild(bt)}
+    g.appendChild(document.createElement("div"));g.appendChild(w)}
+  const hc=document.createElement("div");hc.className="hcol";hc.style.height=H+"px";
+  for(let h=h0;h<=h1;h+=2){const s=document.createElement("span");s.style.top=y(h*60)+"px";s.textContent=h;hc.appendChild(s)}
+  g.appendChild(hc);
+  for(const k of keys){const col=document.createElement("div");col.className="col";col.style.height=H+"px";
+    for(let h=h0;h<=h1;h++){const l=document.createElement("div");l.className="hl";l.style.top=y(h*60)+"px";col.appendChild(l)}
+    const list=lanesFor(timed.filter(x=>x.date===k).map(x=>({x,s:toMin(x.start),e:x.end?Math.max(toMin(x.end),toMin(x.start)+15):toMin(x.start)+60})).sort((p,q)=>p.s-q.s));
+    for(const t of list){const bt=document.createElement("button");bt.className="wb";bt.style.setProperty("--cat",catColor(t.x.cat));
+      bt.style.top=y(t.s)+"px";bt.style.height=Math.max(12,y(t.e)-y(t.s)-1)+"px";bt.style.left=`calc(${t.col*100/t.n}% + 1px)`;bt.style.right="auto";bt.style.width=`calc(${100/t.n}% - 2px)`;
+      bt.textContent=t.x.title;bt.title=`${t.x.start} ${t.x.title}`;bt.onclick=()=>openForm(t.x._base,t.x._occ);col.appendChild(bt)}
+    if(k===today){const n=new Date();const nm=n.getHours()*60+n.getMinutes();if(nm>=h0*60&&nm<=h1*60){const l=document.createElement("div");l.className="hl";l.style.borderTop="2px solid var(--sun)";l.style.top=y(nm)+"px";col.appendChild(l)}}
+    col.onclick=e=>{if(e.target===col){sel=k;render()}};
+    g.appendChild(col)}
+}
+
+/* ---------- 交通費 ---------- */
+let costMonth=(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)})();
+function renderCost(){
+  const y=costMonth.getFullYear(),m=costMonth.getMonth();
+  $("c-month").textContent=`${y}年${m+1}月`;
+  const from=ymd(new Date(y,m,1)),to=ymd(new Date(y,m+1,0));
+  const items=expand(from,to).filter(x=>x.fare).sort((a,b)=>a.date.localeCompare(b.date)||(a.start||"").localeCompare(b.start||""));
+  const total=items.reduce((s,x)=>s+x.fare.ic,0),totalTk=items.reduce((s,x)=>s+x.fare.tk,0);
+  const byCat={};for(const x of items){byCat[x.cat]=(byCat[x.cat]||0)+x.fare.ic}
+  const body=$("c-body");
+  if(!items.length){body.innerHTML=`<p class="hint">この月に記録された交通費はありません。予定の入力画面で「交通費として記録する」にチェックを入れると、ここに集計されます。</p>`;return}
+  body.innerHTML=`<div class="costsum"><span class="big">${total.toLocaleString()}円</span><span class="hint">IC運賃・${items.length}件（きっぷなら ${totalTk.toLocaleString()}円）</span></div>
+    <div class="costcats">${Object.entries(byCat).map(([c,v])=>`<span style="--cat:${catColor(c)}">${getCat(c).name} ${v.toLocaleString()}円</span>`).join("")}</div>
+    <ul class="costlist"></ul>`;
+  const ul=body.querySelector(".costlist");
+  for(const x of items){const li=document.createElement("li");const d=parse(x.date);
+    li.innerHTML=`<span class="d">${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]})</span><span class="t"></span><span class="a">${x.fare.ic.toLocaleString()}円</span>`;
+    const t=li.querySelector(".t");t.textContent=x.title;const sm=document.createElement("small");sm.textContent=`${x.fare.from}→${x.fare.to}${x.fare.round?"（往復）":"（片道）"}`;t.appendChild(sm);ul.appendChild(li)}
+}
+$("costBtn").onclick=()=>{renderCost();$("costOverlay").hidden=false};
+$("c-prev").onclick=()=>{costMonth=new Date(costMonth.getFullYear(),costMonth.getMonth()-1,1);renderCost()};
+$("c-next").onclick=()=>{costMonth=new Date(costMonth.getFullYear(),costMonth.getMonth()+1,1);renderCost()};
+$("c-close").onclick=()=>{$("costOverlay").hidden=true};
+$("costOverlay").addEventListener("click",e=>{if(e.target.id==="costOverlay")$("costOverlay").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("costOverlay").hidden=true;$("setOverlay").hidden=true}});
 
 init();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
