@@ -70,9 +70,9 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 .day.today .n{border:1.5px solid var(--accent)}
 .day.sel{background:var(--accent-soft)}
 .day.sel .n{background:var(--accent);color:var(--card)}
-.marks{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;max-width:100%}
-.marks i{width:6px;height:6px;border-radius:50%;display:block}
-.marks b{font-size:.62rem;color:var(--muted);font-weight:400;line-height:6px}
+.marks{display:flex;flex-direction:column;gap:3px;width:100%;padding:0 3px;align-items:stretch}
+.marks i{height:4px;border-radius:2px;display:block;width:100%}
+.marks b{font-size:.62rem;color:var(--muted);font-weight:400;line-height:1;text-align:center}
 
 .agenda{display:flex;flex-direction:column;gap:14px}
 .dayhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -108,6 +108,23 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .cats label{flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;color:var(--ink);font-size:.85rem;cursor:pointer}
 .cats input{width:auto;accent-color:var(--accent)}
 .cats label:has(input:checked){border-color:var(--cat);background:var(--accent-soft)}
+.cats label .sw{width:10px;height:10px;border-radius:50%;background:var(--cat);flex:none}
+.cats label input{position:absolute;opacity:0;pointer-events:none}
+.cats label{position:relative}
+.cats .x{border:none;background:transparent;color:var(--muted);padding:0 0 0 2px;font-size:.9rem;line-height:1}
+.cats .x.armed{color:var(--sun);font-size:.72rem}
+.cats .addcat{border:1px dashed var(--line);background:transparent;border-radius:99px;padding:4px 12px;font-size:.85rem;color:var(--muted)}
+.cats .addcat:hover{border-color:var(--accent);color:var(--accent)}
+.catbox{display:flex;flex-direction:column;gap:8px}
+.catlbl{font-size:.8rem;color:var(--muted)}
+.newcat{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--paper)}
+.newcat input[type=text]{background:var(--card)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches label{width:28px;height:28px;border-radius:50%;background:var(--c);cursor:pointer;border:2px solid transparent;display:block;position:relative}
+.swatches input{position:absolute;opacity:0;pointer-events:none}
+.swatches label:has(input:checked){border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--card)}
+.swatches label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.ncact{display:flex;gap:8px;justify-content:flex-end}
 .actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:4px}
 .actions .r{display:flex;gap:8px;margin-left:auto}
 .primary{background:var(--accent);color:var(--card);border:none;border-radius:8px;padding:8px 18px;font-weight:700}
@@ -160,7 +177,15 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
         <label>開始<input id="f-start" type="time"></label>
         <label>終了<input id="f-end" type="time"></label>
       </div>
-      <div class="cats" id="f-cats"></div>
+      <div class="catbox">
+        <span class="catlbl">カテゴリ</span>
+        <div class="cats" id="f-cats" role="radiogroup" aria-label="カテゴリ"></div>
+        <div class="newcat" id="newCat" hidden>
+          <input type="text" id="nc-name" maxlength="12" placeholder="カテゴリ名（例：バイト、サークル）" aria-label="新しいカテゴリ名">
+          <div class="swatches" id="nc-colors" role="radiogroup" aria-label="色"></div>
+          <div class="ncact"><button type="button" class="ghost" id="nc-cancel">やめる</button><button type="button" class="primary" id="nc-ok">カテゴリを追加</button></div>
+        </div>
+      </div>
       <label>メモ<textarea id="f-memo" rows="3" maxlength="500"></textarea></label>
       <p class="err" id="f-err" hidden></p>
       <div class="actions">
@@ -176,6 +201,13 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 
 <script>
 const CATS={lab:{name:"研究",v:"--c-lab"},class:{name:"授業",v:"--c-class"},plan:{name:"予定",v:"--c-plan"},me:{name:"個人",v:"--c-me"}};
+const PALETTE=["#d0563f","#d99a1e","#3a93a8","#5f9a3a","#7a5cc2","#c95c8c","#6b7a8f","#e07b39"];
+const CKEY="schedule-cats-v1";
+let customCats=(()=>{try{const a=JSON.parse(localStorage.getItem(CKEY)||"[]");return Array.isArray(a)?a:[]}catch(e){return[]}})();
+function saveCats(){try{localStorage.setItem(CKEY,JSON.stringify(customCats))}catch(e){}}
+function getCat(id){if(CATS[id])return{id,name:CATS[id].name,color:`var(${CATS[id].v})`,builtin:true};
+  const c=customCats.find(x=>x.id===id);return c?{id,name:c.name,color:c.color,builtin:false}:{id:"plan",name:CATS.plan.name,color:`var(${CATS.plan.v})`,builtin:true}}
+function allCats(){return[...Object.keys(CATS).map(getCat),...customCats.map(c=>getCat(c.id))]}
 const WD=["日","月","火","水","木","金","土"];
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,"0");
@@ -202,7 +234,7 @@ function init(){
 
 /* ---------- バックアップ（JSON書き出し・読み込み） ---------- */
 $("exportBtn").onclick=()=>{
-  const blob=new Blob([JSON.stringify({app:"nittei-techo",version:1,events},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({app:"nittei-techo",version:2,categories:customCats,events},null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="日程手帳-"+today+".json";
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 };
@@ -212,9 +244,10 @@ $("importFile").onchange=async e=>{
   try{
     const j=JSON.parse(await f.text());const list=Array.isArray(j)?j:j.events;
     if(!Array.isArray(list))throw 0;
+    if(Array.isArray(j.categories)){for(const c of j.categories){if(c&&c.id&&c.name&&/^#[0-9a-f]{6}$/i.test(c.color||"")&&!CATS[c.id]&&!customCats.some(x=>x.id===c.id)){customCats.push({id:String(c.id),name:String(c.name).slice(0,12),color:c.color})}}saveCats()}
     let n=0;for(const ev of list){if(ev&&ev.title&&/^\d{4}-\d{2}-\d{2}$/.test(ev.date||"")){
       const id=ev.id||("e"+Date.now().toString(36)+n);const i=events.findIndex(x=>x.id===id);
-      const clean={id,title:String(ev.title),date:ev.date,start:ev.start||"",end:ev.end||"",place:ev.place||"",memo:ev.memo||"",cat:CATS[ev.cat]?ev.cat:"plan"};
+      const clean={id,title:String(ev.title),date:ev.date,start:ev.start||"",end:ev.end||"",place:ev.place||"",memo:ev.memo||"",cat:(CATS[ev.cat]||customCats.some(c=>c.id===ev.cat))?ev.cat:"plan"};
       i<0?events.push(clean):events[i]=clean;n++}}
     local.save();render();setSync(true,n+"件を復元しました");
   }catch(err){setSync(false,"読み込めないファイルです")}
@@ -224,7 +257,7 @@ $("importFile").onchange=async e=>{
 /* ---------- 描画 ---------- */
 function byTime(a,b){return (a.start||"").localeCompare(b.start||"")||a.title.localeCompare(b.title)}
 function eventsOn(d){return events.filter(e=>e.date===d).sort(byTime)}
-function catColor(c){return `var(${(CATS[c]||CATS.plan).v})`}
+function catColor(c){return getCat(c).color}
 
 function render(){
   const y=view.getFullYear(),m=view.getMonth();
@@ -268,19 +301,54 @@ function render(){
 }
 function evItem(e){
   const li=document.createElement("li");const b=document.createElement("button");b.className="ev";b.style.setProperty("--cat",catColor(e.cat));
-  b.innerHTML=`<span class="t">${e.start?e.start+(e.end?"<br>–"+e.end:""):"終日"}</span><span><span class="ttl"></span><div class="meta"><span class="chip">${(CATS[e.cat]||CATS.plan).name}</span><span class="pl"></span></div></span>`;
-  b.querySelector(".ttl").textContent=e.title;
+  b.innerHTML=`<span class="t">${e.start?e.start+(e.end?"<br>–"+e.end:""):"終日"}</span><span><span class="ttl"></span><div class="meta"><span class="chip"></span><span class="pl"></span></div></span>`;
+  b.querySelector(".ttl").textContent=e.title;b.querySelector(".chip").textContent=getCat(e.cat).name;
   b.querySelector(".pl").textContent=[e.place,e.memo].filter(Boolean).join(" · ");
   b.onclick=()=>openForm(e);li.appendChild(b);return li;
 }
 
 /* ---------- 入力シート ---------- */
-$("f-cats").innerHTML=Object.entries(CATS).map(([k,c])=>`<label style="--cat:var(${c.v})"><input type="radio" name="cat" id="cat-${k}" value="${k}">${c.name}</label>`).join("");
+function renderCats(selected){
+  const box=$("f-cats");box.textContent="";
+  for(const c of allCats()){
+    const l=document.createElement("label");l.style.setProperty("--cat",c.color);
+    const inp=document.createElement("input");inp.type="radio";inp.name="cat";inp.id="cat-"+c.id;inp.value=c.id;inp.checked=c.id===selected;
+    const sw=document.createElement("span");sw.className="sw";
+    const t=document.createElement("span");t.textContent=c.name;
+    l.append(inp,sw,t);
+    if(!c.builtin){
+      const x=document.createElement("button");x.type="button";x.className="x";x.textContent="×";x.setAttribute("aria-label",c.name+"を削除");
+      x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();
+        if(!x.classList.contains("armed")){x.classList.add("armed");x.textContent="削除?";setTimeout(()=>{x.classList.remove("armed");x.textContent="×"},3000);return}
+        customCats=customCats.filter(k=>k.id!==c.id);saveCats();
+        const cur=(document.querySelector('input[name="cat"]:checked')||{}).value;
+        renderCats(cur===c.id?"lab":cur);render()};
+      l.appendChild(x);
+    }
+    box.appendChild(l);
+  }
+  const add=document.createElement("button");add.type="button";add.className="addcat";add.textContent="＋ カテゴリを追加";
+  add.onclick=()=>{$("newCat").hidden=false;$("nc-name").value="";
+    const used=new Set(customCats.map(c=>c.color));const pick=PALETTE.find(p=>!used.has(p))||PALETTE[0];
+    $("nc-colors").querySelectorAll("input").forEach(i=>i.checked=i.value===pick);$("nc-name").focus()};
+  box.appendChild(add);
+}
+$("nc-colors").innerHTML=PALETTE.map((p,i)=>`<label style="--c:${p}" title="色${i+1}"><input type="radio" name="nccolor" id="ncc-${i}" value="${p}" aria-label="色${i+1}"></label>`).join("");
+function addCategory(){
+  const name=$("nc-name").value.trim();
+  if(!name){$("nc-name").focus();return}
+  const color=(document.querySelector('input[name="nccolor"]:checked')||{}).value||PALETTE[0];
+  const id="c"+Date.now().toString(36);
+  customCats.push({id,name,color});saveCats();$("newCat").hidden=true;renderCats(id);
+}
+$("nc-ok").onclick=addCategory;
+$("nc-cancel").onclick=()=>{$("newCat").hidden=true};
+$("nc-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addCategory()}});
 function openForm(e,date){
   editing=e||null;$("formTitle").textContent=e?"予定を編集":"予定を追加";
   $("f-title").value=e?.title||"";$("f-date").value=e?.date||date||sel;$("f-place").value=e?.place||"";
   $("f-start").value=e?.start||"";$("f-end").value=e?.end||"";$("f-memo").value=e?.memo||"";
-  $("cat-"+(e?.cat||"lab")).checked=true;$("delBtn").hidden=!e;$("f-err").hidden=true;
+  renderCats(e?(getCat(e.cat).id):"lab");$("newCat").hidden=true;$("delBtn").hidden=!e;$("f-err").hidden=true;
   $("overlay").hidden=false;setTimeout(()=>$("f-title").focus(),50);
 }
 function closeForm(){$("overlay").hidden=true;editing=null}
