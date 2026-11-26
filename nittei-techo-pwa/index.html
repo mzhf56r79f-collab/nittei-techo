@@ -157,6 +157,13 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .rlegs{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .rlegs span{color:var(--muted);font-size:.78rem;margin-left:6px}
 .rnote{font-size:.75rem;color:var(--muted);margin:0}
+.infolinks{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem}
+.infolinks .lbl{color:var(--muted)}
+.infolinks a{display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:var(--card);border-radius:99px;padding:3px 10px}
+.infolinks a:hover{border-color:var(--accent);color:var(--accent)}
+.infolinks a::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lc)}
+.infolinks a.cert{font-size:.75rem;color:var(--muted)}
+.infolinks a.cert::before{display:none}
 .fsel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
 .swap{border:1px solid var(--line);background:var(--card);border-radius:8px;width:38px;height:38px;font-size:1rem}
 .newcat{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--paper)}
@@ -198,6 +205,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
       <span class="lt" id="locText">現在地はまだ取得していません</span>
       <button class="ghost" id="locBtn" type="button">現在地を取得</button>
     </div>
+    <div class="infolinks" id="nowInfo"></div>
   </div>
 </section>
 
@@ -363,11 +371,18 @@ function railRoute(fromName,toName){
     const f=fareFor(p.co==="JR"?RAIL.jrFare:RAIL.tobuFare,km);if(!f)return null;ic+=f.ic;tk+=f.tk;fareParts.push({...p,km,...f})}
   return{from:A,to:B,minutes:Math.round(dist[end]),legs:legs.map(l=>({line:l.sv.name,co:l.sv.co,from:l.from,to:l.to,min:Math.round(l.min),stops:l.stops})),ic,tk,fareParts,transfers:legs.length-1};
 }
+const RAIL_INFO={
+  JR:{name:"常磐線",status:"https://traininfo.jreast.co.jp/train_info/kanto.aspx#direction_jouban",cert:"https://traininfo.jreast.co.jp/delay_certificate/",color:"var(--c-class)"},
+  "東武":{name:"アーバンパークライン",status:"https://www.tobu.co.jp/service_status/",cert:"https://www.tobu.co.jp/railway/useful/delay/",color:"var(--c-lab)"}
+};
+function infoLinksHTML(cos,withCert){
+  return `<div class="infolinks"><span class="lbl">運行情報</span>${cos.map(c=>{const i=RAIL_INFO[c];return `<a href="${i.status}" target="_blank" rel="noopener" style="--lc:${i.color}">${i.name}</a>`}).join("")}${withCert?cos.map(c=>`<a class="cert" href="${RAIL_INFO[c].cert}" target="_blank" rel="noopener">${RAIL_INFO[c].name}の遅延証明書</a>`).join(""):""}</div>`;
+}
 function railHTML(r){
   if(!r)return"";
   const legs=r.legs.map(l=>`<li><b>${l.line}</b> ${l.from} → ${l.to}<span>約${l.min}分・${l.stops}駅</span></li>`).join("");
   const fp=r.fareParts.length>1?`<p class="rnote">運賃の内訳：${r.fareParts.map(p=>`${p.co} ${p.from}〜${p.to}（${p.km.toFixed(1)}km）IC ${p.ic}円`).join("＋")}</p>`:`<p class="rnote">${r.fareParts[0].co} ${r.fareParts[0].km.toFixed(1)}km</p>`;
-  return `<div class="rres"><div class="rsum"><span class="rmin">約${r.minutes}<small>分</small></span><span class="rfare">IC ${r.ic.toLocaleString()}円<small>きっぷ ${r.tk.toLocaleString()}円</small></span><span class="rtr">${r.transfers?`乗換${r.transfers}回`:"乗換なし"}</span></div><ol class="rlegs">${legs}</ol>${fp}<p class="rnote">所要時間は待ち時間を含まない目安です。運賃は${RAIL.updated}時点の公式運賃表から計算しています。</p></div>`;
+  return `<div class="rres"><div class="rsum"><span class="rmin">約${r.minutes}<small>分</small></span><span class="rfare">IC ${r.ic.toLocaleString()}円<small>きっぷ ${r.tk.toLocaleString()}円</small></span><span class="rtr">${r.transfers?`乗換${r.transfers}回`:"乗換なし"}</span></div><ol class="rlegs">${legs}</ol>${fp}${infoLinksHTML([...new Set(r.legs.map(l=>l.co))],false)}<p class="rnote">所要時間は待ち時間を含まない目安です。遅延がある場合は実際の時間が長くなります。運賃は${RAIL.updated}時点の公式運賃表から計算しています。</p></div>`;
 }
 
 const CATS={lab:{name:"研究",v:"--c-lab"},class:{name:"授業",v:"--c-class"},plan:{name:"予定",v:"--c-plan"},me:{name:"個人",v:"--c-me"}};
@@ -684,6 +699,8 @@ function getLocation(){
 $("locBtn").onclick=getLocation;
 // 以前に許可済みなら、開いたときに自動で更新する
 try{navigator.permissions&&navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted")getLocation()}).catch(()=>{})}catch(e){}
+
+$("nowInfo").innerHTML=infoLinksHTML(["JR","東武"],true);
 
 /* ---------- 運賃・時間の画面 ---------- */
 (function(){
