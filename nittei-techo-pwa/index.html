@@ -5,32 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>日程手帳</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2f4a8a">
+<meta name="theme-color" content="#3aa3b4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="日程手帳">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Fredoka:wght@500;600&display=swap">
 <style>
-/* Layout: 手帳の見開き — 左に月カレンダー、右にその日の予定。狭い画面では縦積み + 下から出る入力シート */
+/* Layout: カワウソの川辺の手帳 — 水色の川と、毛並みの茶色。左にカレンダー、右にその日の予定。狭い画面では縦積み */
 :root{
-  --paper:#f6f7f9; --card:#ffffff; --ink:#1d2433; --muted:#6b7385; --line:#dde1e8;
-  --accent:#2f4a8a; --accent-soft:#e6ebf6; --sun:#c8402f; --sat:#2f6fb8;
-  --c-lab:#2f4a8a; --c-class:#2e7d5b; --c-plan:#b8752a; --c-me:#9a4a8c;
-  --display:"Zen Old Mincho","Hiragino Mincho ProN",serif;
-  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --paper:#eaf6f5; --card:#ffffff; --ink:#3d2e26; --muted:#8a776a; --line:#d4e8e6;
+  --accent:#2f97a9; --accent-soft:#dbf0f0; --sun:#e2685e; --sat:#3d86c6;
+  --fur:#8b5e3c; --fur-soft:#f5e6d3; --cheek:#f4a3a0; --wave:#bfe3e2;
+  --c-lab:#2f97a9; --c-class:#5ea64a; --c-plan:#e39a3b; --c-me:#d9789a;
+  --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --mono:"Fredoka","Zen Maru Gothic",ui-rounded,system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#12151c; --card:#1a1f29; --ink:#e7eaf0; --muted:#98a0b2; --line:#2c3341;
-  --accent:#8fa8e6; --accent-soft:#232c42; --sun:#ef7a69; --sat:#79aef0;
-  --c-lab:#8fa8e6; --c-class:#6cc39b; --c-plan:#e3a75e; --c-me:#d690c8; color-scheme:dark}}
+  --paper:#10201f; --card:#182c2b; --ink:#f3e9df; --muted:#a9998c; --line:#284240;
+  --accent:#6cc8d6; --accent-soft:#1f3a3b; --sun:#f08a7e; --sat:#7fb6ec;
+  --fur:#b4835e; --fur-soft:#3a2c22; --cheek:#e58f8b; --wave:#22403f;
+  --c-lab:#6cc8d6; --c-class:#8fcf7a; --c-plan:#f0b866; --c-me:#eb9ab6; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#12151c; --card:#1a1f29; --ink:#e7eaf0; --muted:#98a0b2; --line:#2c3341;
-  --accent:#8fa8e6; --accent-soft:#232c42; --sun:#ef7a69; --sat:#79aef0;
-  --c-lab:#8fa8e6; --c-class:#6cc39b; --c-plan:#e3a75e; --c-me:#d690c8; color-scheme:dark}
+  --paper:#10201f; --card:#182c2b; --ink:#f3e9df; --muted:#a9998c; --line:#284240;
+  --accent:#6cc8d6; --accent-soft:#1f3a3b; --sun:#f08a7e; --sat:#7fb6ec;
+  --fur:#b4835e; --fur-soft:#3a2c22; --cheek:#e58f8b; --wave:#22403f;
+  --c-lab:#6cc8d6; --c-class:#8fcf7a; --c-plan:#f0b866; --c-me:#eb9ab6; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 img{max-width:100%}
@@ -46,9 +49,14 @@ button{cursor:pointer}
 .wrap{max-width:1040px;margin:0 auto;display:grid;gap:20px;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}
 @media (max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}}
 
-header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{font-family:var(--display);font-size:1.35rem;letter-spacing:.06em;margin:0}
-.now{max-width:1040px;margin:0 auto 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:6px 20px;align-items:center}
+header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brandbox{display:flex;align-items:center;gap:10px;min-width:0}
+.mascot{width:58px;height:58px;flex:none;filter:drop-shadow(0 3px 0 var(--wave))}
+@media (prefers-reduced-motion:no-preference){.mascot{animation:bob 3.2s ease-in-out infinite;transform-origin:50% 90%}@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}}
+.brand{font-family:var(--display);font-weight:700;font-size:1.45rem;letter-spacing:.08em;margin:0;line-height:1.2;color:var(--fur)}
+.bubble{position:relative;display:inline-block;margin-top:2px;font-size:.8rem;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:2px 10px;color:var(--ink)}
+.bubble::before{content:"";position:absolute;left:-7px;top:50%;width:10px;height:10px;background:var(--card);border-left:1.5px solid var(--line);border-bottom:1.5px solid var(--line);transform:translateY(-50%) rotate(45deg)}
+.now{max-width:1040px;margin:0 auto 16px;background-color:var(--card);border:1px solid var(--line);box-shadow:0 4px 0 var(--wave);border-radius:22px;padding:16px 18px 22px;display:grid;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2780%27 height=%2712%27 viewBox=%270 0 80 12%27%3E%3Cpath d=%27M0 6q10-6 20 0t20 0 20 0 20 0%27 fill=%27none%27 stroke=%27%23a9dcdb%27 stroke-width=%272%27 opacity=%27.6%27/%3E%3C/svg%3E");background-repeat:repeat-x;background-position:left bottom 6px;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:6px 20px;align-items:center}
 @media (max-width:560px){.now{grid-template-columns:minmax(0,1fr)}}
 .clock{display:flex;flex-direction:column;gap:2px;min-width:0}
 .clock .tm{font-family:var(--mono);font-size:2.1rem;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
@@ -67,13 +75,13 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .sync.ok .dot{background:var(--c-class)}
 
-.cal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.cal{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 4px 0 var(--wave)}
 .calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .nav button{white-space:nowrap}
-.month{font-family:var(--display);font-size:1.6rem;margin:0;font-variant-numeric:tabular-nums}
+.month{font-family:var(--mono);font-weight:600;font-size:1.7rem;margin:0;font-variant-numeric:tabular-nums;color:var(--fur)}
 .month small{font-size:.9rem;color:var(--muted);margin-right:6px;font-family:var(--mono)}
 .nav{display:flex;gap:6px}
-.nav button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:4px 10px;min-height:34px}
+.nav button{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:4px 12px;min-height:34px}
 .nav button:hover{background:var(--accent-soft)}
 .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
 .dow{font-size:.72rem;text-align:center;color:var(--muted);padding:4px 0;letter-spacing:.1em}
@@ -82,9 +90,9 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 .day:hover{background:var(--accent-soft)}
 .day.out{opacity:.35}
 .day.sun .n{color:var(--sun)}.day.sat .n{color:var(--sat)}
-.day .n{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;font-size:.9rem}
-.day.today .n{border:1.5px solid var(--accent)}
-.day.sel{background:var(--accent-soft)}
+.day .n{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;font-size:.95rem;font-weight:500}
+.day.today .n{border:2px solid var(--fur);font-weight:700}
+.day.sel{background:var(--accent-soft);border-radius:14px}
 .day.sel .n{background:var(--accent);color:var(--card)}
 .marks{display:flex;flex-direction:column;gap:3px;width:100%;padding:0 3px;align-items:stretch}
 .marks i{height:4px;border-radius:2px;display:block}
@@ -97,17 +105,19 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 
 .agenda{display:flex;flex-direction:column;gap:14px}
 .dayhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.dayhead h2{font-family:var(--display);font-size:1.3rem;margin:0}
+.dayhead h2{font-family:var(--display);font-weight:700;font-size:1.3rem;margin:0;color:var(--fur)}
 .dayhead span{color:var(--muted);font-size:.85rem}
 .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.ev{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--cat);border-radius:10px;padding:10px 12px;text-align:left;width:100%}
+.ev{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--cat);border-radius:16px;padding:10px 12px;text-align:left;width:100%;box-shadow:0 2px 0 var(--line)}
 .ev:hover{border-color:var(--cat)}
 .ev .t{font-family:var(--mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.35}
 .ev .ttl{font-weight:500;overflow-wrap:anywhere}
 .ev .meta{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
 .chip{display:inline-block;font-size:.7rem;padding:0 7px;border-radius:99px;background:var(--accent-soft);color:var(--cat);margin-right:6px;letter-spacing:.05em}
-.empty{border:1px dashed var(--line);border-radius:10px;padding:18px;color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.ghost{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 12px}
+.empty{border:2px dashed var(--wave);border-radius:18px;padding:16px;color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.empty .sleepy{display:flex;align-items:center;gap:10px}
+.empty .sleepy svg{width:52px;height:52px;flex:none;transform:rotate(-8deg)}
+.ghost{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 14px}
 .ghost:hover{border-color:var(--accent)}
 .sub{font-size:.75rem;letter-spacing:.14em;color:var(--muted);margin:6px 0 0}
 .up{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
@@ -115,15 +125,16 @@ header.top{max-width:1040px;margin:0 auto 16px;display:flex;align-items:baseline
 .up .d{font-family:var(--mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .up .x{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.fab{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--card);border:none;border-radius:99px;padding:12px 20px;font-weight:700;box-shadow:0 6px 18px rgba(20,30,60,.25);z-index:5}
+.fab{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--card);border:none;border-radius:99px;padding:12px 20px;font-weight:700;box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 55%,#000 45%);z-index:5;font-size:1rem}
+.fab:active{transform:translateY(2px);box-shadow:0 2px 0 color-mix(in srgb,var(--accent) 55%,#000 45%)}
 
 .overlay{position:fixed;inset:0;background:rgba(10,14,24,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
-.sheet{background:var(--card);width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-height:92%;overflow:auto}
-@media (min-width:761px){.overlay{align-items:center}.sheet{border-radius:16px}}
-.sheet h3{font-family:var(--display);margin:0 0 12px;font-size:1.2rem}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:26px 26px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-height:92%;overflow:auto}
+@media (min-width:761px){.overlay{align-items:center}.sheet{border-radius:26px}}
+.sheet h3{font-family:var(--display);font-weight:700;color:var(--fur);margin:0 0 12px;font-size:1.2rem}
 form{display:flex;flex-direction:column;gap:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
-input,select,textarea{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:16px;min-width:0;width:100%}
+input,select,textarea{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;font-size:16px;min-width:0;width:100%}
 .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .cats{display:flex;gap:6px;flex-wrap:wrap}
 .cats label{flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;color:var(--ink);font-size:.85rem;cursor:pointer}
@@ -140,7 +151,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .catlbl{font-size:.8rem;color:var(--muted)}
 .route{display:flex;flex-direction:column;gap:8px}
 .route>.ghost{align-self:flex-start;font-size:.85rem}
-.routebox{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--paper)}
+.routebox{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--paper)}
 .routebox input,.routebox select{background:var(--card)}
 .routelinks{display:flex;gap:8px;flex-wrap:wrap}
 .routelinks a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border-radius:8px;padding:8px 12px;font-size:.88rem;font-weight:500}
@@ -148,7 +159,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .routelinks a.g{border:1px solid var(--line);color:var(--ink);background:var(--card)}
 .routelinks a[aria-disabled="true"]{opacity:.45;pointer-events:none}
 .hint{font-size:.78rem;color:var(--muted);margin:0}
-.rres{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;display:flex;flex-direction:column;gap:8px}
+.rres{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:12px;display:flex;flex-direction:column;gap:8px}
 .rsum{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .rmin{font-family:var(--mono);font-size:1.6rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
 .rmin small{font-size:.85rem;margin-left:2px;color:var(--muted)}
@@ -177,8 +188,8 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .ncact{display:flex;gap:8px;justify-content:flex-end}
 .actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:4px}
 .actions .r{display:flex;gap:8px;margin-left:auto}
-.primary{background:var(--accent);color:var(--card);border:none;border-radius:8px;padding:8px 18px;font-weight:700}
-.danger{background:transparent;color:var(--sun);border:1px solid var(--sun);border-radius:8px;padding:8px 12px}
+.primary{background:var(--accent);color:var(--card);border:none;border-radius:99px;padding:8px 20px;font-weight:700}
+.danger{background:transparent;color:var(--sun);border:1.5px solid var(--sun);border-radius:99px;padding:8px 12px}
 .err{color:var(--sun);font-size:.82rem;margin:0}
 /* 繰り返し・締め切り・交通費 */
 .chk{flex-direction:row!important;align-items:center;gap:8px!important;color:var(--ink)!important;font-size:.88rem!important}
@@ -190,7 +201,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .badge.dl{color:var(--sun)}
 .ev .go{font-size:.78rem;color:var(--accent);font-weight:500;margin-top:2px}
 .ev.done .ttl{text-decoration:line-through;color:var(--muted)}
-.deadlines{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.deadlines{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 3px 0 var(--wave);padding:12px;display:flex;flex-direction:column;gap:6px}
 .deadlines h3{margin:0;font-size:.85rem;letter-spacing:.08em;color:var(--muted);font-weight:500}
 .dl-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-size:.9rem}
 .dl-row input{width:18px;height:18px;accent-color:var(--accent)}
@@ -201,7 +212,7 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 .dl-row .left.over{background:transparent;color:var(--sun);border:1px solid var(--sun)}
 .dl-row.done .nm{text-decoration:line-through;color:var(--muted)}
 /* 表示切替 */
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:99px;overflow:hidden;background:var(--card)}
 .seg button{border:none;background:transparent;padding:4px 10px;font-size:.8rem;min-height:30px}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--card)}
 .dayhead{justify-content:space-between}
@@ -266,7 +277,29 @@ input,select,textarea{background:var(--paper);border:1px solid var(--line);borde
 
 
 <header class="top">
-  <h1 class="brand">日程手帳</h1>
+  <div class="brandbox">
+    <span class="mascot" aria-hidden="true"><svg width="58" height="58" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <g fill="#8b5e3c"><circle cx="27" cy="36" r="11"/><circle cx="93" cy="36" r="11"/></g>
+  <g fill="#6b4329"><circle cx="27" cy="36" r="5.5"/><circle cx="93" cy="36" r="5.5"/></g>
+  <ellipse cx="60" cy="60" rx="41" ry="37" fill="#8b5e3c"/>
+  <g fill="#f5e6d3"><ellipse cx="60" cy="75" rx="27" ry="19"/><ellipse cx="44" cy="58" rx="13" ry="12"/><ellipse cx="76" cy="58" rx="13" ry="12"/></g>
+  <g fill="#2b1d16"><circle cx="45" cy="57" r="5.2"/><circle cx="75" cy="57" r="5.2"/></g>
+  <g fill="#fff"><circle cx="46.8" cy="55.2" r="1.8"/><circle cx="76.8" cy="55.2" r="1.8"/></g>
+  <ellipse cx="60" cy="67" rx="7.5" ry="5.2" fill="#2b1d16"/>
+  <ellipse cx="58" cy="65.4" rx="2.2" ry="1.2" fill="#6b5148"/>
+  <path d="M60 72v3M60 75q-4.5 4.5-9 1.5M60 75q4.5 4.5 9 1.5" fill="none" stroke="#2b1d16" stroke-width="2" stroke-linecap="round"/>
+  <g fill="#f4a3a0" opacity=".75"><ellipse cx="33" cy="71" rx="6" ry="3.8"/><ellipse cx="87" cy="71" rx="6" ry="3.8"/></g>
+  <g stroke="#b99b80" stroke-width="1.4" stroke-linecap="round"><path d="M41 72l-12-2M41 76l-11 2M79 72l12-2M79 76l11 2"/></g>
+  <rect x="42" y="86" width="36" height="28" rx="5" fill="#fff" stroke="#d7c3ad" stroke-width="1.5"/>
+  <rect x="42" y="86" width="36" height="8" rx="4" fill="#3aa3b4"/>
+  <rect x="42" y="90" width="36" height="4" fill="#3aa3b4"/>
+  <g fill="#3aa3b4" opacity=".55"><rect x="47" y="99" width="5" height="4" rx="1"/><rect x="55" y="99" width="5" height="4" rx="1"/><rect x="63" y="99" width="5" height="4" rx="1"/><rect x="47" y="106" width="5" height="4" rx="1"/><rect x="55" y="106" width="5" height="4" rx="1"/></g>
+  <rect x="63" y="106" width="5" height="4" rx="1" fill="#f08a7e"/>
+  <g fill="#8b5e3c"><ellipse cx="42" cy="96" rx="7" ry="6"/><ellipse cx="78" cy="96" rx="7" ry="6"/></g>
+  <g stroke="#6b4329" stroke-width="1.2" stroke-linecap="round"><path d="M40 93v4M44 93v4M76 93v4M80 93v4"/></g>
+</svg></span>
+    <div><h1 class="brand">日程手帳</h1><span class="bubble" id="greet">今日もがんばろ〜</span></div>
+  </div>
   <div class="tools"><div class="sync" id="sync"><span class="dot"></span><span id="syncText">読み込み中…</span></div><button class="ghost" id="fareBtn">運賃・時間</button><button class="ghost" id="costBtn">交通費</button><button class="ghost" id="setBtn">設定</button><button class="ghost" id="exportBtn">バックアップ</button><button class="ghost" id="importBtn">復元</button><input type="file" id="importFile" accept="application/json,.json" hidden></div>
 </header>
 
@@ -525,6 +558,7 @@ function saveCats(){try{localStorage.setItem(CKEY,JSON.stringify(customCats))}ca
 function getCat(id){if(CATS[id])return{id,name:CATS[id].name,color:`var(${CATS[id].v})`,builtin:true};
   const c=customCats.find(x=>x.id===id);return c?{id,name:c.name,color:c.color,builtin:false}:{id:"plan",name:CATS.plan.name,color:`var(${CATS.plan.v})`,builtin:true}}
 function allCats(){return[...Object.keys(CATS).map(getCat),...customCats.map(c=>getCat(c.id))]}
+const OTTER_SVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">\n  <g fill="#8b5e3c"><circle cx="27" cy="36" r="11"/><circle cx="93" cy="36" r="11"/></g>\n  <g fill="#6b4329"><circle cx="27" cy="36" r="5.5"/><circle cx="93" cy="36" r="5.5"/></g>\n  <ellipse cx="60" cy="60" rx="41" ry="37" fill="#8b5e3c"/>\n  <g fill="#f5e6d3"><ellipse cx="60" cy="75" rx="27" ry="19"/><ellipse cx="44" cy="58" rx="13" ry="12"/><ellipse cx="76" cy="58" rx="13" ry="12"/></g>\n  <g fill="#2b1d16"><circle cx="45" cy="57" r="5.2"/><circle cx="75" cy="57" r="5.2"/></g>\n  <g fill="#fff"><circle cx="46.8" cy="55.2" r="1.8"/><circle cx="76.8" cy="55.2" r="1.8"/></g>\n  <ellipse cx="60" cy="67" rx="7.5" ry="5.2" fill="#2b1d16"/>\n  <ellipse cx="58" cy="65.4" rx="2.2" ry="1.2" fill="#6b5148"/>\n  <path d="M60 72v3M60 75q-4.5 4.5-9 1.5M60 75q4.5 4.5 9 1.5" fill="none" stroke="#2b1d16" stroke-width="2" stroke-linecap="round"/>\n  <g fill="#f4a3a0" opacity=".75"><ellipse cx="33" cy="71" rx="6" ry="3.8"/><ellipse cx="87" cy="71" rx="6" ry="3.8"/></g>\n  <g stroke="#b99b80" stroke-width="1.4" stroke-linecap="round"><path d="M41 72l-12-2M41 76l-11 2M79 72l12-2M79 76l11 2"/></g>\n  <rect x="42" y="86" width="36" height="28" rx="5" fill="#fff" stroke="#d7c3ad" stroke-width="1.5"/>\n  <rect x="42" y="86" width="36" height="8" rx="4" fill="#3aa3b4"/>\n  <rect x="42" y="90" width="36" height="4" fill="#3aa3b4"/>\n  <g fill="#3aa3b4" opacity=".55"><rect x="47" y="99" width="5" height="4" rx="1"/><rect x="55" y="99" width="5" height="4" rx="1"/><rect x="63" y="99" width="5" height="4" rx="1"/><rect x="47" y="106" width="5" height="4" rx="1"/><rect x="55" y="106" width="5" height="4" rx="1"/></g>\n  <rect x="63" y="106" width="5" height="4" rx="1" fill="#f08a7e"/>\n  <g fill="#8b5e3c"><ellipse cx="42" cy="96" rx="7" ry="6"/><ellipse cx="78" cy="96" rx="7" ry="6"/></g>\n  <g stroke="#6b4329" stroke-width="1.2" stroke-linecap="round"><path d="M40 93v4M44 93v4M76 93v4M80 93v4"/></g>\n</svg>`;
 const WD=["日","月","火","水","木","金","土"];
 const REPEAT_LABEL={daily:"毎日",weekdays:"平日",weekly:"毎週",biweekly:"隔週",monthly:"毎月"};
 const $=id=>document.getElementById(id);
@@ -651,7 +685,14 @@ function render(){
   }
   renderAgenda();
 }
+function updateGreet(){
+  const h=new Date().getHours();const n=ready?eventsOn(today).length:0;
+  const hi=h<5?"夜ふかしだね":h<11?"おはよう！":h<17?"こんにちは！":"おつかれさま！";
+  const dl=ready?expand(today,addDays(today,3)).filter(x=>x.deadline&&!isDone(x)).length:0;
+  $("greet").textContent=`${hi}${n?`今日の予定は${n}件だよ`:"今日は予定なし、のんびりしよ〜"}${dl?`（締め切りが近いのが${dl}件）`:""}`;
+}
 function renderAgenda(){
+  updateGreet();
   const sd=parse(sel);
   $("dayTitle").textContent=`${sd.getMonth()+1}月${sd.getDate()}日（${WD[sd.getDay()]}）`;
   const list=eventsOn(sel);
@@ -660,7 +701,7 @@ function renderAgenda(){
   if(!ready){ul.innerHTML=`<li class="empty">予定を読み込んでいます…</li>`}
   else if(!list.length){
     const li=document.createElement("li");li.className="empty";
-    li.innerHTML=events.length?`<span>この日の予定はありません。</span>`:`<span>まだ予定がありません。右下の「予定を追加」から最初の予定を登録できます。</span>`;
+    li.innerHTML=`<div class="sleepy">${OTTER_SVG}<span>${events.length?"この日は予定なし。のんびりしよ〜":"まだ予定がないよ。右下の「予定を追加」から最初の予定を入れてね。"}</span></div>`;
     const b=document.createElement("button");b.className="ghost";b.textContent="この日に予定を追加";b.onclick=()=>openForm(null,sel);li.appendChild(b);
     if(!events.length){const s=document.createElement("button");s.className="ghost";s.textContent="サンプル予定を入れて試す";s.onclick=addSamples;li.appendChild(s)}
     ul.appendChild(li);
